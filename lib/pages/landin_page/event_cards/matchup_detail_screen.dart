@@ -230,7 +230,7 @@ class _MatchupDetailScreenState extends State<MatchupDetailScreen> {
               ),
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }

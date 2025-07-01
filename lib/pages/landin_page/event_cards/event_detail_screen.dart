@@ -550,7 +550,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           ),
                         ),
                       );
-                    }).toList(),
+                    }),
                   ],
                 ),
               const SizedBox(height: 30),

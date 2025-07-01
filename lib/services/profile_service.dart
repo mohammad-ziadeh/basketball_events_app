@@ -108,7 +108,6 @@ class Badge {
 
 class ProfileService {
   final String baseUrl = ApiConfig.baseUrl;
-
   final IStorage _storage = kIsWeb ? WebStorage() : MobileStorage();
 
   Future<Profile> fetchProfile() async {
@@ -158,4 +157,28 @@ class ProfileService {
       throw Exception(error['message'] ?? 'Failed to upload image');
     }
   }
+
+
+
+  
+  static Future<int?> getLoggedInUserId() async {
+    final IStorage storage = kIsWeb ? WebStorage() : MobileStorage();
+    final token = await storage.read(key: 'token');
+    if (token == null) return null;
+
+    final String url = '${ApiConfig.baseUrl}/api/user';
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      final user = jsonDecode(response.body);
+      return user['id'] as int?;
+    }
+
+    return null;
+  }
+
+  
 }

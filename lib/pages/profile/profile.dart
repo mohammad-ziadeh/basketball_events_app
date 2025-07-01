@@ -1,6 +1,6 @@
 import 'dart:io';
-
-import 'package:flutter/material.dart';
+import 'package:fiba_3x3/pages/profile/profile_leader_board.dart';
+import 'package:flutter/material.dart' hide Badge;
 import 'package:fiba_3x3/widgets/appBar.dart';
 import 'package:fiba_3x3/widgets/custom_drawer.dart';
 import 'package:fiba_3x3/pages/profile/profile_about.dart';
@@ -23,12 +23,15 @@ class _ProfilePageState extends State<ProfilePage>
   late TabController _tabController;
   Profile? profile;
   bool isLoading = true;
+  int? playerRank;
+  int? loggedInPlayerId;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
     _loadProfile();
+    _loadLoggedInUserId();
   }
 
   Future<void> _loadProfile() async {
@@ -45,6 +48,19 @@ class _ProfilePageState extends State<ProfilePage>
         isLoading = false;
       });
       print("Failed to load profile: $e");
+    }
+  }
+
+  Future<void> _loadLoggedInUserId() async {
+    try {
+      final id = await ProfileService.getLoggedInUserId();
+      if (mounted) {
+        setState(() {
+          loggedInPlayerId = id;
+        });
+      }
+    } catch (e) {
+      print('Failed to load logged-in user ID: $e');
     }
   }
 
@@ -85,6 +101,7 @@ class _ProfilePageState extends State<ProfilePage>
                 height: 300,
                 child: _TopPortion(
                   profile: profile,
+                  playerRank: playerRank,
                   onImageChanged: () => _refreshProfile(context),
                 ),
               ),
@@ -100,6 +117,9 @@ class _ProfilePageState extends State<ProfilePage>
                     ),
                     const SizedBox(height: 16),
                     _ProfileInfoRow(profile: profile, loading: isLoading),
+                    const SizedBox(height: 20),
+                    if (!isLoading && profile != null)
+                      _BadgesRow(badges: profile!.badges),
                     const SizedBox(height: 20),
                     SizedBox(
                       height: 48,
@@ -118,7 +138,7 @@ class _ProfilePageState extends State<ProfilePage>
                         tabs: const [
                           Tab(text: 'ABOUT'),
                           Tab(text: 'ACTIVITY'),
-                          Tab(text: 'RANKING'),
+                          Tab(text: 'LEADERBOARD'),
                           Tab(text: 'SOCIAL MEDIA'),
                         ],
                       ),
@@ -130,8 +150,30 @@ class _ProfilePageState extends State<ProfilePage>
                         children: [
                           PlayerAboutPage(profile: profile),
                           PlayedEventsPage(profile: profile),
+                          FutureBuilder<int?>(
+                            future: ProfileService.getLoggedInUserId(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              }
+                              if (!snapshot.hasData || snapshot.data == null) {
+                                return const Center(
+                                  child: Text(
+                                    'Failed to get logged in user ID',
+                                  ),
+                                );
+                              }
+                              final loggedInUserId = snapshot.data!;
+                              return LeaderBoardPage(
+                                profile: profile,
+                                loggedInPlayerId: loggedInUserId,
+                              );
+                            },
+                          ),
                           Center(child: Text('${profile?.points ?? 0} Points')),
-                          const Center(child: Text('Coming Soon')),
                         ],
                       ),
                     ),
@@ -142,8 +184,58 @@ class _ProfilePageState extends State<ProfilePage>
           ),
         ),
       ),
-
       endDrawer: const CustomDrawer(),
+    );
+  }
+}
+
+class _BadgesRow extends StatelessWidget {
+  final List<Badge> badges;
+
+  final Map<String, int> _pointsRequired = {
+    'Rookie': 0,
+    'Pro Player': 35,
+    'All-Star': 70,
+    'Elite': 100,
+    'Legend': 150,
+  };
+
+  _BadgesRow({required this.badges});
+
+  @override
+  Widget build(BuildContext context) {
+    if (badges.isEmpty) {
+      return const Text('No badges earned yet.');
+    }
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      alignment: WrapAlignment.center,
+      children:
+          badges.map((badge) {
+            return GestureDetector(
+              onTap: () {
+                final requiredPoints = _pointsRequired[badge.title] ?? 0;
+                final msg =
+                    badge.unlocked
+                        ? 'Badge "${badge.title}" unlocked!'
+                        : 'Need $requiredPoints points to unlock "${badge.title}".';
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(msg)));
+              },
+              child: Chip(
+                label: Text(badge.title),
+                backgroundColor:
+                    badge.unlocked ? Colors.amber[300] : Colors.grey[400],
+                avatar:
+                    badge.unlocked
+                        ? const Icon(Icons.star, color: Colors.white, size: 18)
+                        : const Icon(Icons.lock, color: Colors.white, size: 18),
+              ),
+            );
+          }).toList(),
     );
   }
 }
@@ -152,8 +244,7 @@ class _ProfileInfoRow extends StatelessWidget {
   final Profile? profile;
   final bool loading;
 
-  const _ProfileInfoRow({Key? key, this.profile, required this.loading})
-    : super(key: key);
+  const _ProfileInfoRow({this.profile, required this.loading});
 
   @override
   Widget build(BuildContext context) {
@@ -208,9 +299,13 @@ class ProfileInfoItem {
 class _TopPortion extends StatefulWidget {
   final Profile? profile;
   final VoidCallback onImageChanged;
+  final int? playerRank;
 
-  const _TopPortion({Key? key, this.profile, required this.onImageChanged})
-    : super(key: key);
+  const _TopPortion({
+    this.profile,
+    required this.onImageChanged,
+    this.playerRank,
+  });
 
   @override
   State<_TopPortion> createState() => _TopPortionState();
@@ -226,9 +321,7 @@ class _TopPortionState extends State<_TopPortion> {
     if (pickedFile != null) {
       try {
         File imageFile = File(pickedFile.path);
-
         await ProfileService().uploadProfileImage(type, imageFile);
-
         widget.onImageChanged();
       } catch (e) {
         ScaffoldMessenger.of(
@@ -327,7 +420,7 @@ class _TopPortionState extends State<_TopPortion> {
                             Positioned(
                               top: 70,
                               child: Text(
-                                '1',
+                                widget.profile?.rank ?? 'N/A',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 14,
