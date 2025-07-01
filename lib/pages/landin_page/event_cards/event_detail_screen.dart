@@ -510,47 +510,42 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Expanded(
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      '${matchup.teamA.name}   VS   ${matchup.teamB.name}',
-                                      style: theme.textTheme.bodyLarge
-                                          ?.copyWith(color: textColor),
-                                    ),
-                                  ],
+                                child: Text(
+                                  '${matchup.teamA.name}   VS   ${matchup.teamB.name}',
+                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                    color: textColor,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              Row(
-                                children: [
-                                  if (isLiveOrSoon)
-                                    Row(
-                                      children: [
-                                        SpinKitThreeBounce(
-                                          color: Colors.green,
-                                          size: 16.0,
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          'Live',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.green,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 10),
-                                      ],
-                                    )
-                                  else ...[
-                                    Text(
-                                      formattedMatchTime,
-                                      style: theme.textTheme.bodyMedium
-                                          ?.copyWith(color: secondaryTextColor),
+                              const SizedBox(width: 12),
+                              if (isLiveOrSoon)
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SpinKitThreeBounce(
+                                      color: Colors.green,
+                                      size: 16.0,
                                     ),
-                                    const SizedBox(width: 8),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'Live',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.green,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ],
-                                ],
-                              ),
+                                )
+                              else
+                                Text(
+                                  formattedMatchTime,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: secondaryTextColor,
+                                  ),
+                                ),
                             ],
                           ),
                         ),

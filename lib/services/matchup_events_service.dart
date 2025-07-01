@@ -1,5 +1,149 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'api_config.dart';
+
+class MatchSummary {
+  final String matchTime;
+  final int id;
+  final String teamAName;
+  final String teamBName;
+  final String? winnerTeam;
+  final PlayerStat? topAssistPlayer;
+  final PlayerStat? highestScorePlayer;
+  final TeamFoul? mostFoulTeam;
+  final TeamPoint teamAPoints;
+  final TeamPoint teamBPoints;
+  final List<PlayerStat> allPlayerStats;
+
+  MatchSummary({
+    required this.matchTime,
+    required this.id,
+    required this.teamAName,
+    required this.teamBName,
+    required this.winnerTeam,
+    required this.topAssistPlayer,
+    required this.highestScorePlayer,
+    required this.mostFoulTeam,
+    required this.teamAPoints,
+    required this.teamBPoints,
+    required this.allPlayerStats,
+  });
+
+  factory MatchSummary.fromJson(Map<String, dynamic> json) {
+    return MatchSummary(
+      matchTime: json['match_time'] ?? '',
+      id: json['id'] ?? 0,
+      teamAName: json['team_a_name'] ?? '',
+      teamBName: json['team_b_name'] ?? '',
+      winnerTeam: json['winner_team'],
+      topAssistPlayer:
+          json['top_assist_player'] != null
+              ? PlayerStat.fromJson(json['top_assist_player'])
+              : null,
+      highestScorePlayer:
+          json['top_score_player'] != null
+              ? PlayerStat.fromJson(json['top_score_player'])
+              : null,
+      mostFoulTeam:
+          json['most_foul_team'] != null
+              ? TeamFoul.fromJson(json['most_foul_team'])
+              : null,
+      teamAPoints: TeamPoint.fromJson(json['team_a_points']),
+      teamBPoints: TeamPoint.fromJson(json['team_b_points']),
+      allPlayerStats:
+          (json['all_player_stats'] as List)
+              .map((e) => PlayerStat.fromJson(e))
+              .toList(),
+    );
+  }
+
+  firstWhere(
+    bool Function(dynamic e) param0, {
+    required MatchSummary Function() orElse,
+  }) {}
+}
+
+class PlayerStat {
+  final int playerId;
+  final String playerName;
+  final int points;
+  final int assists;
+  final int fouls;
+
+  PlayerStat({
+    required this.playerId,
+    required this.playerName,
+    required this.points,
+    required this.assists,
+    required this.fouls,
+  });
+
+  factory PlayerStat.fromJson(Map<String, dynamic> json) {
+    return PlayerStat(
+      playerId: json['player_id'],
+      playerName: json['player_name'],
+      points: json['points'],
+      assists: json['assists'],
+      fouls: json['fouls'],
+    );
+  }
+}
+
+class TeamFoul {
+  final int teamId;
+  final String teamName;
+  final int fouls;
+
+  TeamFoul({required this.teamId, required this.teamName, required this.fouls});
+
+  factory TeamFoul.fromJson(Map<String, dynamic> json) {
+    return TeamFoul(
+      teamId: json['team_id'],
+      teamName: json['team_name'],
+      fouls: json['fouls'],
+    );
+  }
+}
+
+class TeamPoint {
+  final int teamId;
+  final String teamName;
+  final int points;
+
+  TeamPoint({
+    required this.teamId,
+    required this.teamName,
+    required this.points,
+  });
+
+  factory TeamPoint.fromJson(Map<String, dynamic> json) {
+    return TeamPoint(
+      teamId: json['team_id'],
+      teamName: json['team_name'],
+      points: json['points'],
+    );
+  }
+}
+
+class MatchSummaryService {
+  static Future<MatchSummary> fetchMatchSummary(int matchupId) async {
+    final url = Uri.parse(
+      '${ApiConfig.baseUrl}/api/matchups/$matchupId/summary',
+    );
+
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      return MatchSummary.fromJson(jsonData);
+    } else {
+      throw Exception('Failed to load match summary');
+    }
+  }
+}
+
+
+
 
 
 class Team {
