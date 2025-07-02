@@ -4,7 +4,7 @@ import 'package:flutter/material.dart' hide Badge;
 import 'package:fiba_3x3/widgets/appBar.dart';
 import 'package:fiba_3x3/widgets/custom_drawer.dart';
 import 'package:fiba_3x3/pages/profile/profile_about.dart';
-import 'package:fiba_3x3/pages/profile/profile_events.dart';
+// import 'package:fiba_3x3/pages/profile/profile_events.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -29,7 +29,7 @@ class _ProfilePageState extends State<ProfilePage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _loadProfile();
     _loadLoggedInUserId();
   }
@@ -137,7 +137,7 @@ class _ProfilePageState extends State<ProfilePage>
                         unselectedLabelColor: Colors.grey,
                         tabs: const [
                           Tab(text: 'ABOUT'),
-                          Tab(text: 'ACTIVITY'),
+                          // Tab(text: 'ACTIVITY'),
                           Tab(text: 'LEADERBOARD'),
                           Tab(text: 'SOCIAL MEDIA'),
                         ],
@@ -149,7 +149,7 @@ class _ProfilePageState extends State<ProfilePage>
                         controller: _tabController,
                         children: [
                           PlayerAboutPage(profile: profile),
-                          PlayedEventsPage(profile: profile),
+                          // PlayedEventsPage(profile: profile),
                           FutureBuilder<int?>(
                             future: ProfileService.getLoggedInUserId(),
                             builder: (context, snapshot) {
@@ -226,7 +226,12 @@ class _BadgesRow extends StatelessWidget {
                 ).showSnackBar(SnackBar(content: Text(msg)));
               },
               child: Chip(
-                label: Text(badge.title),
+                label: Text(
+                  badge.title,
+                  style: TextStyle(
+                    color: const Color.fromARGB(255, 109, 109, 109),
+                  ),
+                ),
                 backgroundColor:
                     badge.unlocked ? Colors.amber[300] : Colors.grey[400],
                 avatar:

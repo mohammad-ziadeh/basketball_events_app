@@ -155,14 +155,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage>
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              Text(
-                                player.teamName,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: textColor.withOpacity(0.7),
-                                ),
-                              ),
+
                               const SizedBox(width: 16),
                               Text(
                                 '${player.points} pts',

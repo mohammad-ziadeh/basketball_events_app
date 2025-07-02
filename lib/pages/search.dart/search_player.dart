@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:fiba_3x3/pages/search.dart/player_profile/player_profile_page.dart';
 import 'package:fiba_3x3/services/players_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -278,7 +279,17 @@ class _SearchPlayerState extends State<SearchPlayer>
 
         return InkWell(
           onTap: () {
-            // TODO: Navigate to player profile
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (_) => ReadOnlyPlayerProfilePage(
+                      playerId: player.id,
+                  
+                      onToggleTheme: widget.onToggleTheme,
+                    ),
+              ),
+            );
           },
           child: Card(
             margin: const EdgeInsets.symmetric(vertical: 8),
