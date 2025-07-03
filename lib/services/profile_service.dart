@@ -158,9 +158,6 @@ class ProfileService {
     }
   }
 
-
-
-  
   static Future<int?> getLoggedInUserId() async {
     final IStorage storage = kIsWeb ? WebStorage() : MobileStorage();
     final token = await storage.read(key: 'token');
@@ -179,6 +176,4 @@ class ProfileService {
 
     return null;
   }
-
-  
 }

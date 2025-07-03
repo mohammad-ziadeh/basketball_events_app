@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.compile.JavaCompile
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -9,7 +11,6 @@ android {
     namespace = "com.example.fiba_3x3"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
-    
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -22,10 +23,7 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.fiba_3x3"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -34,10 +32,12 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
         }
+    }
+
+    tasks.withType<JavaCompile>().configureEach {
+        options.compilerArgs.add("-Xlint:-options")
     }
 }
 
@@ -46,6 +46,5 @@ flutter {
 }
 
 dependencies {
-    // Add this line to enable core library desugaring
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }
