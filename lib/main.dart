@@ -55,7 +55,34 @@ class _MyAppState extends State<MyApp> {
         iconTheme: const IconThemeData(color: Colors.black),
         primaryIconTheme: const IconThemeData(color: Colors.black),
         scaffoldBackgroundColor: Colors.white,
+
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.black, // button text white
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.black, // text button text black
+          ),
+        ),
+
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            foregroundColor: Colors.black,
+            side: const BorderSide(color: Colors.black),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
       ),
+
       // ----- {{ End Light Theme }} ----- //
 
       // ----- {{ Dark Theme }} ----- //
@@ -73,6 +100,32 @@ class _MyAppState extends State<MyApp> {
         iconTheme: const IconThemeData(color: Colors.white),
         primaryIconTheme: const IconThemeData(color: Colors.white),
         cardColor: Colors.white,
+
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.black,
+            backgroundColor: Colors.white, // button text black
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white, // text button text white
+          ),
+        ),
+
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            foregroundColor: Colors.white,
+            side: const BorderSide(color: Colors.white),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
       ),
 
       // ----- {{ End Dark Theme }} ----- //

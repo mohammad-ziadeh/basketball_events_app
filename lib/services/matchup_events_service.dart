@@ -142,21 +142,31 @@ class MatchSummaryService {
   }
 }
 
-
-
-
-
 class Team {
   final int id;
   final String name;
+  final Category? category;
 
-  Team({required this.id, required this.name});
+  Team({required this.id, required this.name, this.category});
 
   factory Team.fromJson(Map<String, dynamic> json) {
     return Team(
       id: json['id'],
       name: json['name'],
+      category:
+          json['category'] != null ? Category.fromJson(json['category']) : null,
     );
+  }
+}
+
+class Category {
+  final int id;
+  final String name;
+
+  Category({required this.id, required this.name});
+
+  factory Category.fromJson(Map<String, dynamic> json) {
+    return Category(id: json['id'], name: json['name']);
   }
 }
 
@@ -185,7 +195,10 @@ class Matchup {
       eventId: json['event_id'],
       teamA: Team.fromJson(json['team_a']),
       teamB: Team.fromJson(json['team_b']),
-      matchTime: json['match_time'] != null ? DateTime.parse(json['match_time']) : null,
+      matchTime:
+          json['match_time'] != null
+              ? DateTime.parse(json['match_time'])
+              : null,
       location: json['location'],
       round: json['round'],
     );
@@ -213,14 +226,11 @@ class EventWithMatchups {
       title: json['title'],
       eventCode: json['event_code'],
       teams: (json['teams'] as List).map((t) => Team.fromJson(t)).toList(),
-      matchups: (json['matchups'] as List).map((m) => Matchup.fromJson(m)).toList(),
+      matchups:
+          (json['matchups'] as List).map((m) => Matchup.fromJson(m)).toList(),
     );
   }
 }
-
-
-
-
 
 class MatchupService {
   final String baseUrl = "http://192.168.1.159:8000/api";
