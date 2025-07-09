@@ -21,7 +21,7 @@ class EventDetailScreen extends StatefulWidget {
 class _EventDetailScreenState extends State<EventDetailScreen>
     with SingleTickerProviderStateMixin {
   TabController? _tabController;
-
+  Map<int, List<Team>> teamsByCategory = {};
   List<Map<String, dynamic>> coachTeams = [];
   int? selectedTeamId;
   bool isLoading = true;
@@ -32,26 +32,10 @@ class _EventDetailScreenState extends State<EventDetailScreen>
   final TeamService _teamService = TeamService();
   String? userRole;
 
-  List<Map<String, dynamic>> assignedTeams = [];
-  bool isLoadingAssignedTeams = true;
-  String? assignedTeamsError;
-
   List<Matchup> eventMatchups = [];
   bool isLoadingMatchups = true;
   String? matchupError;
   late MatchupService _matchupService;
-
-  Map<String, List<Team>> groupTeamsByCategory(List<Team> teams) {
-    Map<String, List<Team>> map = {};
-
-    for (var team in teams) {
-      String categoryName = team.category?.name ?? "Uncategorized";
-      map.putIfAbsent(categoryName, () => []);
-      map[categoryName]!.add(team);
-    }
-
-    return map;
-  }
 
   // Categories
   List<Category> categories = [];
@@ -70,13 +54,9 @@ class _EventDetailScreenState extends State<EventDetailScreen>
 
     _matchupService = MatchupService();
 
-    // Load user role and data
     _loadUserRole();
     _loadCoachTeams();
-    _loadAssignedTeams();
     _loadMatchups();
-
-    // Load categories from service or mock
     _loadCategories();
   }
 
@@ -87,17 +67,31 @@ class _EventDetailScreenState extends State<EventDetailScreen>
         email: '',
         phone: '',
       );
-
       if (cats.isNotEmpty) {
         _tabController?.dispose();
         _tabController = TabController(length: cats.length, vsync: this);
       }
-
       setState(() {
         categories = cats;
       });
+
+      await fetchAndGroupTeams(widget.event.id);
     } catch (e) {
       print("Failed to load categories: $e");
+    }
+  }
+
+  Future<void> fetchAndGroupTeams(int eventId) async {
+    try {
+      final groupedIntMap = await TeamsByCat.fetchTeamsGroupedByCategory(
+        eventId,
+      );
+      setState(() {
+        teamsByCategory =
+            groupedIntMap; // Store directly as Map<int, List<Team>>
+      });
+    } catch (e) {
+      print("Error fetching teams: $e");
     }
   }
 
@@ -164,37 +158,14 @@ class _EventDetailScreenState extends State<EventDetailScreen>
     }
   }
 
-  Future<void> _loadAssignedTeams() async {
-    setState(() {
-      isLoadingAssignedTeams = true;
-      assignedTeamsError = null;
-    });
-    try {
-      final teams = await _teamService.getTeamsAssignedToEvent(widget.event.id);
-      setState(() {
-        assignedTeams = List<Map<String, dynamic>>.from(teams);
-        isLoadingAssignedTeams = false;
-      });
-    } catch (e) {
-      setState(() {
-        assignedTeamsError = e.toString();
-        isLoadingAssignedTeams = false;
-      });
-    }
-  }
-
   Future<void> _assignTeamToCategory(int categoryId) async {
-    if (selectedTeamId == null ||
-        _enteredEmail == null ||
-        _enteredPhone == null) {
+    if (selectedTeamId == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Please fill all fields.')));
+      ).showSnackBar(const SnackBar(content: Text('Please select a team')));
       return;
     }
-
     setState(() => isAssigning = true);
-
     try {
       await CategoryService().assignTeamToCategory(
         teamId: selectedTeamId!,
@@ -203,21 +174,15 @@ class _EventDetailScreenState extends State<EventDetailScreen>
         email: _enteredEmail!,
         phone: _enteredPhone!,
       );
-
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Team successfully assigned!')),
       );
-
       Navigator.pop(context); // Close dialog
-      await _loadAssignedTeams(); // Refresh list
+      await fetchAndGroupTeams(widget.event.id); // Refresh teams per category
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Failed to assign team: you have already assigned this team to a category.',
-          ),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to assign team: $e')));
     } finally {
       setState(() => isAssigning = false);
     }
@@ -486,7 +451,6 @@ class _EventDetailScreenState extends State<EventDetailScreen>
     final textColor = isDark ? Colors.white : Colors.black;
     final secondaryTextColor = isDark ? Colors.white70 : Colors.black87;
     final iconColor = isDark ? Colors.white : Colors.black;
-    final borderColor = isDark ? Colors.white : Colors.black;
 
     final imageUrlWithVersion =
         widget.event.imageUrl != null
@@ -616,8 +580,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                         : const SizedBox.shrink(),
               ),
 
-            if ((userRole == 'coach' || userRole == 'admin') &&
-                !isRegistrationClosed)
+            if (categories.isNotEmpty && !isRegistrationClosed)
               if (_tabController != null)
                 SizedBox(
                   height: 300,
@@ -625,98 +588,94 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                     controller: _tabController,
                     children:
                         categories.map((category) {
+                          final teams = teamsByCategory[category.id] ?? [];
+
+                          // Filter only approved teams
+                          final approvedTeams =
+                              teams.where((team) {
+                                return team.pivot != null &&
+                                    team.pivot?.status == 'approved';
+                              }).toList();
+
+                          final isFull =
+                              approvedTeams.length >= category.capacity;
+
                           return Padding(
                             padding: const EdgeInsets.only(top: 10),
                             child: Column(
                               children: [
-                                ElevatedButton.icon(
-                                  onPressed:
-                                      () => _showAssignTeamDialog(
-                                        context,
-                                        category,
+                                if (!isFull)
+                                  ElevatedButton.icon(
+                                    onPressed:
+                                        () => _showAssignTeamDialog(
+                                          context,
+                                          category,
+                                        ),
+                                    icon: const Icon(Icons.add),
+                                    label: const Text("Assign Team"),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.orange,
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
-                                  icon: const Icon(Icons.add),
-                                  label: const Text("Assign Team"),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.orange,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                                Text(
-                                  'Teams Assigned to ${category.name}:',
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: textColor,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                if (isLoadingAssignedTeams)
-                                  Center(
-                                    child: CircularProgressIndicator(
-                                      color: iconColor,
-                                    ),
-                                  )
-                                else if (assignedTeamsError != null)
-                                  Center(
-                                    child: Text(
-                                      'Error loading teams: $assignedTeamsError',
-                                    ),
-                                  )
-                                else if (assignedTeams.isEmpty)
-                                  Text(
-                                    'No teams assigned yet.',
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: secondaryTextColor,
                                     ),
                                   )
                                 else
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children:
-                                        assignedTeams
-                                            .where(
-                                              (team) =>
-                                                  team['category']?['id'] ==
-                                                  category.id,
-                                            )
-                                            .map((team) {
-                                              return Container(
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                      vertical: 6,
-                                                    ),
-                                                padding: const EdgeInsets.all(
-                                                  12,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                    color: borderColor,
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                  color:
-                                                      isDark
-                                                          ? Colors.grey[900]
-                                                          : Colors.grey[100],
-                                                ),
-                                                child: Text(
-                                                  team['name'] ??
-                                                      'Unnamed Team',
-                                                  style: theme
-                                                      .textTheme
-                                                      .bodyLarge
-                                                      ?.copyWith(
-                                                        color: textColor,
-                                                      ),
-                                                ),
-                                              );
-                                            })
-                                            .toList(),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                      horizontal: 16,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.redAccent,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Text(
+                                      'Full',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+
+                                const SizedBox(height: 20),
+
+                                Text(
+                                  'Teams Assigned to ${category.name} (${approvedTeams.length}/${category.capacity}):',
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color:
+                                        Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? Colors.white
+                                            : Colors.black,
+                                  ),
+                                ),
+
+                                const SizedBox(height: 10),
+
+                                if (approvedTeams.isEmpty)
+                                  Text(
+                                    'No teams assigned yet.',
+                                    style:
+                                        Theme.of(context).textTheme.bodyMedium,
+                                  )
+                                else
+                                  Expanded(
+                                    child: ListView.builder(
+                                      itemCount: approvedTeams.length,
+                                      itemBuilder: (context, index) {
+                                        final team = approvedTeams[index];
+                                        return ListTile(
+                                          title: Text(team.name),
+                                          leading: const Icon(Icons.group),
+                                        );
+                                      },
+                                    ),
                                   ),
                               ],
                             ),
@@ -732,13 +691,13 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                 isRegistrationClosed) ...[
               if (isLoadingMatchups)
                 Center(child: CircularProgressIndicator(color: iconColor))
-              else if (matchupError != null)
-                Center(
-                  child: Text(
-                    'Error loading match-ups: $matchupError',
-                    style: const TextStyle(color: Colors.redAccent),
-                  ),
-                )
+              // else if (matchupError != null)
+              //   Center(
+              //     child: Text(
+              //       'Error loading match-ups: $matchupError',
+              //       style: const TextStyle(color: Colors.redAccent),
+              //     ),
+              //   )
               else if (eventMatchups.isEmpty)
                 Center(
                   child: Text(
@@ -766,8 +725,8 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                       final now = DateTime.now();
                       bool isLiveOrSoon = false;
                       String formattedMatchTime = 'TBD';
-                      if (matchup.matchTime != null) {
-                        final matchDateTime = matchup.matchTime!;
+                      if (matchup.start_time != null) {
+                        final matchDateTime = matchup.start_time!;
                         final diff = matchDateTime.difference(now).inMinutes;
                         isLiveOrSoon = (diff >= -30 && diff <= 30);
                         formattedMatchTime = DateFormat(
@@ -843,45 +802,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                     }),
                   ],
                 ),
-              const SizedBox(height: 30),
-              if (isLoadingAssignedTeams)
-                Center(child: CircularProgressIndicator(color: iconColor))
-              else if (assignedTeamsError != null)
-                Center(
-                  child: Text(
-                    'Error loading assigned teams: $assignedTeamsError',
-                    style: const TextStyle(color: Colors.redAccent),
-                  ),
-                )
-              else if (assignedTeams.isEmpty)
-                Text(
-                  'No teams assigned to this event yet.',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: secondaryTextColor,
-                  ),
-                )
-              else
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children:
-                      assignedTeams.map((team) {
-                        return Container(
-                          margin: const EdgeInsets.symmetric(vertical: 6),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: borderColor),
-                            borderRadius: BorderRadius.circular(8),
-                            color: isDark ? Colors.grey[900] : Colors.grey[100],
-                          ),
-                          child: Text(
-                            team['name'] ?? 'Unnamed Team',
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              color: textColor,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                ),
+              //
             ],
           ],
         ),

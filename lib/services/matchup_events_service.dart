@@ -63,6 +63,16 @@ class MatchSummary {
   }) {}
 }
 
+class Pivot {
+  final String status;
+
+  Pivot({required this.status});
+
+  factory Pivot.fromJson(Map<String, dynamic> json) {
+    return Pivot(status: json['status'] ?? '');
+  }
+}
+
 class PlayerStat {
   final int playerId;
   final String playerName;
@@ -146,13 +156,15 @@ class Team {
   final int id;
   final String name;
   final Category? category;
+  final Pivot? pivot;
 
-  Team({required this.id, required this.name, this.category});
+  Team({required this.id, required this.name, this.category, this.pivot});
 
   factory Team.fromJson(Map<String, dynamic> json) {
     return Team(
       id: json['id'],
       name: json['name'],
+      pivot: json['pivot'] != null ? Pivot.fromJson(json['pivot']) : null,
       category:
           json['category'] != null ? Category.fromJson(json['category']) : null,
     );
@@ -176,6 +188,7 @@ class Matchup {
   final Team teamA;
   final Team teamB;
   final DateTime? matchTime;
+  final DateTime? start_time;
   final String? location;
   final String? round;
 
@@ -185,6 +198,7 @@ class Matchup {
     required this.teamA,
     required this.teamB,
     this.matchTime,
+    this.start_time,
     this.location,
     this.round,
   });
@@ -198,6 +212,10 @@ class Matchup {
       matchTime:
           json['match_time'] != null
               ? DateTime.parse(json['match_time'])
+              : null,
+      start_time:
+          json['start_time'] != null
+              ? DateTime.parse(json['start_time'])
               : null,
       location: json['location'],
       round: json['round'],
@@ -251,6 +269,35 @@ class MatchupService {
       return Matchup.fromJson(json.decode(response.body));
     } else {
       throw Exception('Failed to load matchup details');
+    }
+  }
+}
+
+class TeamsByCat {
+  static const String baseUrl = "http://192.168.1.159:8000/api";
+
+  static Future<Map<int, List<Team>>> fetchTeamsGroupedByCategory(
+    int eventId,
+  ) async {
+    final url = Uri.parse('$baseUrl/events/$eventId/teams-by-category');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body) as Map<String, dynamic>;
+
+      final map = <int, List<Team>>{};
+
+      data.forEach((categoryIdStr, teamsJson) {
+        final categoryId = int.tryParse(categoryIdStr);
+        if (categoryId != null && teamsJson is List) {
+          map[categoryId] =
+              (teamsJson).map<Team>((e) => Team.fromJson(e)).toList();
+        }
+      });
+
+      return map;
+    } else {
+      throw Exception("Failed to load teams by category");
     }
   }
 }
