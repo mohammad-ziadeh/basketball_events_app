@@ -26,7 +26,11 @@ class CategoryService {
     return await storage.read(key: 'token') ?? '';
   }
 
-  Future<List<Category>> getCategoriesByEvent(int eventId, {required String email, required String phone}) async {
+  Future<List<Category>> getCategoriesByEvent(
+    int eventId, {
+    required String email,
+    required String phone,
+  }) async {
     final token = await fetchToken();
     final response = await http.get(
       Uri.parse('${ApiConfig.baseUrl}/api/events/$eventId/categories'),
@@ -68,14 +72,9 @@ class CategoryService {
     print('Response body: ${response.body}');
 
     if (response.statusCode != 200) {
-      try {
-        final body = jsonDecode(response.body);
-        throw Exception(body['message'] ?? 'Failed to assign team to category');
-      } catch (e) {
-        throw Exception(
-          'Failed to assign team to category. Server returned status code ${response.statusCode} with body:\n${response.body}',
-        );
-      }
+      final body = jsonDecode(response.body);
+      final message = body['message'] ?? 'Failed to assign team to category';
+      throw Exception(message);
     }
   }
 }

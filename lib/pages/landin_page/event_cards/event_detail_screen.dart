@@ -174,15 +174,14 @@ class _EventDetailScreenState extends State<EventDetailScreen>
         email: _enteredEmail!,
         phone: _enteredPhone!,
       );
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Team successfully assigned!')),
-      );
-      Navigator.pop(context); // Close dialog
-      await fetchAndGroupTeams(widget.event.id); // Refresh teams per category
-    } catch (e) {
+
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Failed to assign team: $e')));
+      ).showSnackBar(SnackBar(content: Text('Team assigned successfully')));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+      );
     } finally {
       setState(() => isAssigning = false);
     }
