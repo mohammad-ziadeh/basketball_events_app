@@ -107,64 +107,69 @@ class _MatchupDetailScreenState extends State<MatchupDetailScreen> {
     Color textColor,
     ThemeData theme,
   ) {
-    return Card(
-      color: cardColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Text(
-              '${summary.teamAName} vs ${summary.teamBName}',
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: textColor,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 10),
-            Text(
-              '${summary.teamAPoints.points} - ${summary.teamBPoints.points}',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.deepPurpleAccent,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Time: ${summary.matchTime.isNotEmpty ? DateFormat('MMM d, h:mm a').format(DateTime.parse(summary.matchTime)) : 'TBD'}',
-                  style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
+    return SizedBox(
+      width: double.infinity,
+      child: Card(
+        color: cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 4,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              Text(
+                '${summary.teamAName} vs ${summary.teamBName}',
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
                 ),
-                const SizedBox(height: 6),
-                if (summary.category != null)
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                '${summary.teamAPoints.points} - ${summary.teamBPoints.points}',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepPurpleAccent,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    'Category: ${summary.category!.name}',
+                    'Time: ${summary.matchTime.isNotEmpty ? DateFormat('MMM d, h:mm a').format(DateTime.parse(summary.matchTime)) : 'TBD'}',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: textColor,
                     ),
                   ),
-                if (summary.round != null)
-                  Text(
-                    'Round: ${summary.round!}',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: textColor,
+                  const SizedBox(height: 6),
+                  if (summary.category != null)
+                    Text(
+                      'Category: ${summary.category!.name}',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: textColor,
+                      ),
                     ),
-                  ),
-                if (summary.location != null)
-                  Text(
-                    'Location: ${summary.location!}',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: textColor,
+                  if (summary.round != null)
+                    Text(
+                      'Round: ${summary.round!}',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: textColor,
+                      ),
                     ),
-                  ),
-              ],
-            ),
-          ],
+                  if (summary.location != null)
+                    Text(
+                      'Location: ${summary.location!}',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: textColor,
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

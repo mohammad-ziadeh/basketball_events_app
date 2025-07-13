@@ -63,8 +63,6 @@ class _EventDetailScreenState extends State<EventDetailScreen>
     try {
       final cats = await CategoryService().getCategoriesByEvent(
         widget.event.id,
-        email: '',
-        phone: '',
       );
       if (cats.isNotEmpty) {
         _tabController?.dispose();
@@ -175,7 +173,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Team assigned successfully')));
+      ).showSnackBar(SnackBar(content: Text('Team assigned successfully, now wait for the admin to accept your request.')));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),

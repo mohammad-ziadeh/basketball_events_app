@@ -21,9 +21,8 @@ class _MatchupsWithTabsState extends State<MatchupsWithTabs>
     with TickerProviderStateMixin {
   late List<String> categories;
   late TabController _categoryController;
-  late Map<String, List<String>> roundsByCategory; // rounds grouped by category
-  late Map<String, TabController>
-  _roundControllers; // one controller per category
+  late Map<String, List<String>> roundsByCategory;
+  late Map<String, TabController> _roundControllers;
 
   @override
   void initState() {
@@ -87,7 +86,6 @@ class _MatchupsWithTabsState extends State<MatchupsWithTabs>
         ),
         const SizedBox(height: 12),
 
-        // Category Tab Bar
         TabBar(
           controller: _categoryController,
           isScrollable: true,
@@ -99,9 +97,8 @@ class _MatchupsWithTabsState extends State<MatchupsWithTabs>
 
         const SizedBox(height: 16),
 
-        // Category Tab Views
         SizedBox(
-          height: 350, // increase height to fit inner tabs + content
+          height: 350,
           child: TabBarView(
             controller: _categoryController,
             children:
@@ -111,19 +108,21 @@ class _MatchupsWithTabsState extends State<MatchupsWithTabs>
 
                   return Column(
                     children: [
-                      // Inner Round Tab Bar
-                      TabBar(
-                        controller: roundController,
-                        isScrollable: true,
-                        indicatorColor: isDark ? Colors.white : Colors.black,
-                        labelColor: isDark ? Colors.white : Colors.black,
-                        unselectedLabelColor: Colors.grey,
-                        tabs: rounds.map((round) => Tab(text: round)).toList(),
+                      SizedBox(
+                        height: 30,
+                        child: TabBar(
+                          controller: roundController,
+                          isScrollable: true,
+                          indicatorColor: isDark ? Colors.white : Colors.black,
+                          labelColor: isDark ? Colors.white : Colors.black,
+                          unselectedLabelColor: Colors.grey,
+                          tabs:
+                              rounds.map((round) => Tab(text: round)).toList(),
+                        ),
                       ),
 
                       const SizedBox(height: 12),
 
-                      // Inner Round Tab Views
                       Expanded(
                         child: TabBarView(
                           controller: roundController,

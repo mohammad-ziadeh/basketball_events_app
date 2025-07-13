@@ -105,14 +105,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       Navigator.of(context).pushNamed('/search-player');
                     },
                   ),
-                  if (role == 'coach' || role == 'admin') ...[
-                    _DrawerMenuItem(
-                      title: 'TEAMS',
-                      onTap: () {
-                        Navigator.of(context).pushNamed('/team');
-                      },
-                    ),
-                  ],
+
+                  _DrawerMenuItem(
+                    title: 'TEAMS',
+                    onTap: () {
+                      Navigator.of(context).pushNamed('/team');
+                    },
+                  ),
 
                   const Divider(color: Colors.white30),
                   _DrawerMenuItem(

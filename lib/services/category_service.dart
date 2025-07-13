@@ -26,15 +26,9 @@ class CategoryService {
     return await storage.read(key: 'token') ?? '';
   }
 
-  Future<List<Category>> getCategoriesByEvent(
-    int eventId, {
-    String email = "",
-    String phone = "",
-  }) async {
-    final token = await fetchToken();
+  Future<List<Category>> getCategoriesByEvent(int eventId) async {
     final response = await http.get(
       Uri.parse('${ApiConfig.baseUrl}/api/events/$eventId/categories'),
-      headers: {'Authorization': 'Bearer $token'},
     );
 
     if (response.statusCode == 200) {

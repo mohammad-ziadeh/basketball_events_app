@@ -220,6 +220,7 @@ class Matchup {
   final DateTime? start_time;
   final String? location;
   final String? round;
+  final Category? category;
 
   Matchup({
     required this.id,
@@ -230,13 +231,10 @@ class Matchup {
     this.start_time,
     this.location,
     this.round,
+    this.category,
   });
 
-  Category? get category => teamA.category ?? teamB.category;
-
   String get categoryName => category?.name ?? 'Unknown';
-
-  bool get hasCategory => teamA.category != null || teamB.category != null;
 
   factory Matchup.fromJson(Map<String, dynamic> json) {
     return Matchup(
@@ -254,6 +252,8 @@ class Matchup {
               : null,
       location: json['location'],
       round: json['round'],
+      category:
+          json['category'] != null ? Category.fromJson(json['category']) : null,
     );
   }
 }
