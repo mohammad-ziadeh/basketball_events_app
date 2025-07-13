@@ -1,12 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:fiba_3x3/pages/landin_page/event_cards/matchup_detail_screen.dart';
+import 'package:fiba_3x3/pages/landin_page/event_cards/matchups_with_tabs.dart';
 import 'package:fiba_3x3/services/category_service.dart';
 import 'package:fiba_3x3/services/event_service.dart';
 import 'package:fiba_3x3/services/matchup_events_service.dart' hide Category;
 import 'package:fiba_3x3/services/team_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 
 class EventDetailScreen extends StatefulWidget {
@@ -87,8 +86,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
         eventId,
       );
       setState(() {
-        teamsByCategory =
-            groupedIntMap; // Store directly as Map<int, List<Team>>
+        teamsByCategory = groupedIntMap;
       });
     } catch (e) {
       print("Error fetching teams: $e");
@@ -690,13 +688,13 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                 isRegistrationClosed) ...[
               if (isLoadingMatchups)
                 Center(child: CircularProgressIndicator(color: iconColor))
-              // else if (matchupError != null)
-              //   Center(
-              //     child: Text(
-              //       'Error loading match-ups: $matchupError',
-              //       style: const TextStyle(color: Colors.redAccent),
-              //     ),
-              //   )
+              else if (matchupError != null)
+                Center(
+                  child: Text(
+                    'Error loading match-ups: $matchupError',
+                    style: const TextStyle(color: Colors.redAccent),
+                  ),
+                )
               else if (eventMatchups.isEmpty)
                 Center(
                   child: Text(
@@ -709,99 +707,10 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                   ),
                 )
               else
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Match-ups:',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: textColor,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ...eventMatchups.map((matchup) {
-                      final now = DateTime.now();
-                      bool isLiveOrSoon = false;
-                      String formattedMatchTime = 'TBD';
-                      if (matchup.start_time != null) {
-                        final matchDateTime = matchup.start_time!;
-                        final diff = matchDateTime.difference(now).inMinutes;
-                        isLiveOrSoon = (diff >= -30 && diff <= 30);
-                        formattedMatchTime = DateFormat(
-                          'MMM d, h:mm a',
-                        ).format(matchDateTime);
-                      }
-                      return InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (_) => MatchupDetailScreen(
-                                    matchupId: matchup.id,
-                                  ),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          margin: const EdgeInsets.only(bottom: 8),
-                          decoration: BoxDecoration(
-                            color:
-                                isDark
-                                    ? const Color.fromARGB(255, 52, 52, 66)
-                                    : Colors.grey[100],
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  '${matchup.teamA.name}   VS   ${matchup.teamB.name}',
-                                  style: theme.textTheme.bodyLarge?.copyWith(
-                                    color: textColor,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              if (isLiveOrSoon)
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SpinKitThreeBounce(
-                                      color: Colors.green,
-                                      size: 16.0,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      'Live',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.green,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              else
-                                Text(
-                                  formattedMatchTime,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: secondaryTextColor,
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }),
-                  ],
+                MatchupsWithTabs(
+                  eventMatchups: eventMatchups,
+                  eventId: widget.event.id,
                 ),
-              //
             ],
           ],
         ),

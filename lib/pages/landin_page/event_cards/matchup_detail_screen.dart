@@ -133,9 +133,36 @@ class _MatchupDetailScreenState extends State<MatchupDetailScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            Text(
-              'Time: ${summary.matchTime.isNotEmpty ? DateFormat('MMM d, h:mm a').format(DateTime.parse(summary.matchTime)) : 'TBD'}',
-              style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Time: ${summary.matchTime.isNotEmpty ? DateFormat('MMM d, h:mm a').format(DateTime.parse(summary.matchTime)) : 'TBD'}',
+                  style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
+                ),
+                const SizedBox(height: 6),
+                if (summary.category != null)
+                  Text(
+                    'Category: ${summary.category!.name}',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: textColor,
+                    ),
+                  ),
+                if (summary.round != null)
+                  Text(
+                    'Round: ${summary.round!}',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: textColor,
+                    ),
+                  ),
+                if (summary.location != null)
+                  Text(
+                    'Location: ${summary.location!}',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: textColor,
+                    ),
+                  ),
+              ],
             ),
           ],
         ),

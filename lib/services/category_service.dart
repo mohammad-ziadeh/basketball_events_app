@@ -28,17 +28,14 @@ class CategoryService {
 
   Future<List<Category>> getCategoriesByEvent(
     int eventId, {
-    required String email,
-    required String phone,
+    String email = "",
+    String phone = "",
   }) async {
     final token = await fetchToken();
     final response = await http.get(
       Uri.parse('${ApiConfig.baseUrl}/api/events/$eventId/categories'),
       headers: {'Authorization': 'Bearer $token'},
     );
-
-    print('Status code: ${response.statusCode}');
-    print('Response body: ${response.body}');
 
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);
@@ -67,9 +64,9 @@ class CategoryService {
       body: jsonEncode({'event_id': eventId, 'email': email, 'phone': phone}),
     );
 
-    print('POST $url');
-    print('Status code: ${response.statusCode}');
-    print('Response body: ${response.body}');
+    // print('POST $url');
+    // print('Status code: ${response.statusCode}');
+    // print('Response body: ${response.body}');
 
     if (response.statusCode != 200) {
       final body = jsonDecode(response.body);

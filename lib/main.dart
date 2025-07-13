@@ -59,7 +59,7 @@ class _MyAppState extends State<MyApp> {
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             foregroundColor: Colors.white,
-            backgroundColor: Colors.black, // button text white
+            backgroundColor: Colors.black,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -68,7 +68,7 @@ class _MyAppState extends State<MyApp> {
 
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
-            foregroundColor: Colors.black, // text button text black
+            foregroundColor: Colors.black, 
           ),
         ),
 
@@ -104,7 +104,7 @@ class _MyAppState extends State<MyApp> {
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             foregroundColor: Colors.black,
-            backgroundColor: Colors.white, // button text black
+            backgroundColor: Colors.white, 
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -113,7 +113,7 @@ class _MyAppState extends State<MyApp> {
 
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
-            foregroundColor: Colors.white, // text button text white
+            foregroundColor: Colors.white, 
           ),
         ),
 

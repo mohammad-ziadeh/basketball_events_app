@@ -14,6 +14,10 @@ class MatchSummary {
   final TeamPoint teamAPoints;
   final TeamPoint teamBPoints;
   final List<PlayerStat> allPlayerStats;
+  final String? location;
+  final String? round;
+  final Category? category;
+  final FinalScore finalScore;
 
   MatchSummary({
     required this.matchTime,
@@ -27,6 +31,10 @@ class MatchSummary {
     required this.teamAPoints,
     required this.teamBPoints,
     required this.allPlayerStats,
+    required this.location,
+    required this.round,
+    required this.category,
+    required this.finalScore,
   });
 
   factory MatchSummary.fromJson(Map<String, dynamic> json) {
@@ -54,6 +62,11 @@ class MatchSummary {
           (json['all_player_stats'] as List)
               .map((e) => PlayerStat.fromJson(e))
               .toList(),
+      location: json['location'],
+      round: json['round'],
+      category:
+          json['category'] != null ? Category.fromJson(json['category']) : null,
+      finalScore: FinalScore.fromJson(json['final_score']),
     );
   }
 
@@ -115,6 +128,17 @@ class TeamFoul {
   }
 }
 
+class FinalScore {
+  final int teamA;
+  final int teamB;
+
+  FinalScore({required this.teamA, required this.teamB});
+
+  factory FinalScore.fromJson(Map<String, dynamic> json) {
+    return FinalScore(teamA: json['team_a'], teamB: json['team_b']);
+  }
+}
+
 class TeamPoint {
   final int teamId;
   final String teamName;
@@ -161,12 +185,17 @@ class Team {
   Team({required this.id, required this.name, this.category, this.pivot});
 
   factory Team.fromJson(Map<String, dynamic> json) {
+    final category =
+        json['category'] != null ? Category.fromJson(json['category']) : null;
+    print(
+      'Team ${json['name']} category: ${category?.name ?? 'null'}',
+    ); // DEBUG PRINT
+
     return Team(
       id: json['id'],
       name: json['name'],
       pivot: json['pivot'] != null ? Pivot.fromJson(json['pivot']) : null,
-      category:
-          json['category'] != null ? Category.fromJson(json['category']) : null,
+      category: category,
     );
   }
 }
@@ -202,6 +231,12 @@ class Matchup {
     this.location,
     this.round,
   });
+
+  Category? get category => teamA.category ?? teamB.category;
+
+  String get categoryName => category?.name ?? 'Unknown';
+
+  bool get hasCategory => teamA.category != null || teamB.category != null;
 
   factory Matchup.fromJson(Map<String, dynamic> json) {
     return Matchup(
@@ -243,9 +278,14 @@ class EventWithMatchups {
       id: json['id'],
       title: json['title'],
       eventCode: json['event_code'],
-      teams: (json['teams'] as List).map((t) => Team.fromJson(t)).toList(),
+      teams:
+          (json['teams'] as List<dynamic>? ?? [])
+              .map((t) => Team.fromJson(t))
+              .toList(),
       matchups:
-          (json['matchups'] as List).map((m) => Matchup.fromJson(m)).toList(),
+          (json['matchups'] as List<dynamic>? ?? [])
+              .map((m) => Matchup.fromJson(m))
+              .toList(),
     );
   }
 }
