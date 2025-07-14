@@ -98,8 +98,6 @@ class AuthService {
     return null;
   }
 
-  
-
   Future<void> logout() async {
     final token = await _storage.read(key: 'token');
     if (token != null) {
@@ -114,4 +112,53 @@ class AuthService {
     await _storage.delete(key: 'token');
     await _storage.delete(key: 'user');
   }
+
+  Future<String?> sendVerificationCode() async {
+    final token = await _storage.read(key: 'token');
+    if (token == null) return 'Not authenticated';
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/send-verification-code'),
+      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      return null; // success
+    } else {
+      try {
+        final error = jsonDecode(response.body);
+        return error['message'] ?? 'Failed to send verification code';
+      } catch (e) {
+        return 'Failed to send verification code';
+      }
+    }
+  }
+
+  Future<String?> verifyEmailCode(String code) async {
+    final token = await _storage.read(key: 'token');
+    if (token == null) return 'Not authenticated';
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/verify-email-code'),
+      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
+      body: {'code': code},
+    );
+
+    if (response.statusCode == 200) {
+      // Optionally refresh and save the user again
+      final userResponse = await getUser();
+      if (userResponse != null) {
+        await _storage.write(key: 'user', value: jsonEncode(userResponse));
+      }
+      return null; // success
+    } else {
+      try {
+        final error = jsonDecode(response.body);
+        return error['message'] ?? 'Invalid verification code';
+      } catch (e) {
+        return 'Invalid verification code';
+      }
+    }
+  }
+  
 }

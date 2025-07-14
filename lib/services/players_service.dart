@@ -28,7 +28,9 @@ class Player {
     // city: json['city'],
     // country: json['country'],
     gender: json['gender'],
-    avatarUrl: json['avatar_url'] ?? '',
+    avatarUrl:
+        json['avatar_url'] ??
+        'http://192.168.1.159:8000/storage/profile_images/md9cZcqBcAryyOPmpIhPpjQM1OgookRnXgFlsRbj.jpg',
     ageCategory: json['age_category'],
   );
 }

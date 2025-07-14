@@ -187,9 +187,6 @@ class Team {
   factory Team.fromJson(Map<String, dynamic> json) {
     final category =
         json['category'] != null ? Category.fromJson(json['category']) : null;
-    print(
-      'Team ${json['name']} category: ${category?.name ?? 'null'}',
-    ); // DEBUG PRINT
 
     return Team(
       id: json['id'],

@@ -6,12 +6,14 @@ class PlayerLeaderboardEntry {
   final int playerId;
   final String name;
   final String teamName;
+  final String avatarUrl;
   final int points;
 
   PlayerLeaderboardEntry({
     required this.playerId,
     required this.name,
     required this.teamName,
+    required this.avatarUrl,
     required this.points,
   });
 
@@ -19,6 +21,9 @@ class PlayerLeaderboardEntry {
     return PlayerLeaderboardEntry(
       playerId: json['player_id'] ?? 0,
       name: json['name'] ?? '',
+      avatarUrl:
+          json['avatar_url'] ??
+          'http://192.168.1.159:8000/storage/profile_images/md9cZcqBcAryyOPmpIhPpjQM1OgookRnXgFlsRbj.jpg',
       teamName: json['team_name'] ?? '',
       points: json['points'] ?? 0,
     );
@@ -76,5 +81,21 @@ class LeaderboardService {
     }
   }
 
+  static Future<List<PlayerLeaderboardEntry>> fetchPlayersByTeam(
+    int teamId,
+  ) async {
+    final response = await http.get(
+      Uri.parse('$_baseUrl/api/leaderboard/teams/$teamId/players'),
+    );
 
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      final List<dynamic> playersJson = data['players'] ?? [];
+      return playersJson
+          .map((e) => PlayerLeaderboardEntry.fromJson(e))
+          .toList();
+    } else {
+      throw Exception('Failed to load players for team $teamId');
+    }
+  }
 }

@@ -62,7 +62,6 @@ class NotificationService {
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
-      print('Decoded notifications response: $decoded');
 
       if (decoded is Map &&
           decoded.containsKey('data') &&

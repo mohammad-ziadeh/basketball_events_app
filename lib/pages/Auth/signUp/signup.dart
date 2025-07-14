@@ -1,3 +1,4 @@
+import 'package:fiba_3x3/pages/Auth/signUp/email_verification_page.dart';
 import 'package:fiba_3x3/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -16,6 +17,7 @@ class _StepOnePageState extends State<StepOnePage> {
   final GlobalKey _moreFieldsKey = GlobalKey();
 
   bool _showMoreFields = false;
+  bool _isSubmitting = false;
 
   String? _gender;
   DateTime? _selectedDate;
@@ -97,7 +99,26 @@ class _StepOnePageState extends State<StepOnePage> {
     );
 
     if (errorMessage == null) {
-      // Success: proceed
+      final sendCodeError = await authService.sendVerificationCode();
+      if (sendCodeError != null) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(sendCodeError)));
+      } else {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder:
+                (context) => EmailVerificationPage(
+                  onVerified: () {
+                    Navigator.pop(context);
+                    widget.onNext();
+                  },
+                ),
+          ),
+        );
+      }
+
       return true;
     } else {
       ScaffoldMessenger.of(
@@ -357,17 +378,26 @@ class _StepOnePageState extends State<StepOnePage> {
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       ElevatedButton(
-                                        onPressed: () async {
-                                          if (_formKey.currentState!
-                                              .validate()) {
-                                            FocusScope.of(context).unfocus();
-                                            final success =
-                                                await _submitSignup();
-                                            if (success) {
-                                              widget.onNext();
-                                            }
-                                          }
-                                        },
+                                        onPressed:
+                                            _isSubmitting
+                                                ? null
+                                                : () async {
+                                                  if (_formKey.currentState!
+                                                      .validate()) {
+                                                    FocusScope.of(
+                                                      context,
+                                                    ).unfocus();
+                                                    setState(() {
+                                                      _isSubmitting = true;
+                                                    });
+
+                                                    await _submitSignup();
+
+                                                    setState(() {
+                                                      _isSubmitting = false;
+                                                    });
+                                                  }
+                                                },
                                         style: ElevatedButton.styleFrom(
                                           elevation: 0,
                                           backgroundColor: Colors.black,
@@ -379,7 +409,19 @@ class _StepOnePageState extends State<StepOnePage> {
                                             ),
                                           ),
                                         ),
-                                        child: const Text("Submit"),
+                                        child:
+                                            _isSubmitting
+                                                ? const SizedBox(
+                                                  width: 24,
+
+                                                  height: 24,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                        color: Colors.black,
+                                                        strokeWidth: 2,
+                                                      ),
+                                                )
+                                                : const Text("Submit"),
                                       ),
                                     ],
                                   ),

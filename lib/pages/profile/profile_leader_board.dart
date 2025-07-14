@@ -187,13 +187,6 @@ class _LeaderBoardPageState extends State<LeaderBoardPage>
                       itemCount: teamLeaderboard.length,
                       separatorBuilder: (_, __) => const Divider(height: 1),
                       itemBuilder: (context, index) {
-                        final player = playerLeaderboard[index];
-                        print('Logged-in ID: ${widget.profile?.id}');
-                        print('Logged-in Role: ${widget.profile?.role}');
-                        print(
-                          'Leaderboard Player: ${player.name}, ID: ${player.playerId}',
-                        );
-
                         final team = teamLeaderboard[index];
                         return Container(
                           padding: const EdgeInsets.symmetric(

@@ -86,7 +86,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       Navigator.of(context).pushNamed('/news');
                     },
                   ),
-                  _DrawerMenuItem(title: 'RANKINGS'),
+                  _DrawerMenuItem(
+                    title: 'LEADERBOARD',
+                    onTap: () {
+                      Navigator.of(context).pushNamed('/leaderboard');
+                    },
+                  ),
                   _DrawerMenuItem(
                     title: 'BALL INFO',
                     onTap: () {

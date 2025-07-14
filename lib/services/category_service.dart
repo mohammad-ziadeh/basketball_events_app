@@ -58,9 +58,6 @@ class CategoryService {
       body: jsonEncode({'event_id': eventId, 'email': email, 'phone': phone}),
     );
 
-    // print('POST $url');
-    // print('Status code: ${response.statusCode}');
-    // print('Response body: ${response.body}');
 
     if (response.statusCode != 200) {
       final body = jsonDecode(response.body);
