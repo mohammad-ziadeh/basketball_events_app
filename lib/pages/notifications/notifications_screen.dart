@@ -1,5 +1,6 @@
 import 'package:fiba_3x3/services/NotificationService.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // For better timestamp formatting
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -25,13 +26,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     });
   }
 
+  String formatDateTime(DateTime dt) {
+    return DateFormat.yMMMd().add_jm().format(dt);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? Colors.black : Colors.white;
+    final cardColor =
+        isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF5F5F5);
+
     return Scaffold(
-      backgroundColor:
-          Theme.of(context).brightness == Brightness.dark
-              ? Colors.black
-              : Colors.white,
+      backgroundColor: bgColor,
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: const Text(
@@ -64,10 +71,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           if (snapshot.hasData) {
             final notifications = snapshot.data!;
             if (notifications.isEmpty) {
-              return const Center(
+              return Center(
                 child: Text(
                   "No notifications yet.",
-                  style: TextStyle(color: Colors.white70),
+                  style: TextStyle(
+                    color: isDark ? Colors.white70 : Colors.black54,
+                  ),
                 ),
               );
             }
@@ -81,105 +90,143 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 itemCount: notifications.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
-                  UserNotification notif = notifications[index];
-                  return Container(
+                  final notif = notifications[index];
+                  final isUnread = notif.readAt == null;
+
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 45, 58, 65),
-                      borderRadius: BorderRadius.circular(12),
+                      color:
+                          isUnread
+                              ? cardColor.withOpacity(0.95)
+                              : cardColor.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        if (isUnread)
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                      ],
                     ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
+                    padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Icon + Message Row
                         Row(
                           children: [
                             Icon(
-                              notif.readAt == null
+                              isUnread
                                   ? Icons.notifications_active_outlined
-                                  : Icons.notifications_off_outlined,
+                                  : Icons.notifications_none,
                               color:
-                                  notif.readAt == null
-                                      ? Colors.white
-                                      : const Color.fromARGB(
-                                        255,
-                                        197,
-                                        197,
-                                        197,
-                                      ),
+                                  isUnread
+                                      ? Colors.deepOrangeAccent
+                                      : Colors.grey,
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 10),
                             Expanded(
                               child: Text(
                                 notif.message,
                                 style: TextStyle(
-                                  color:
-                                      Theme.of(context).brightness ==
-                                              Brightness.dark
-                                          ? Colors.white
-                                          : Colors.white,
+                                  fontSize: 16,
                                   fontWeight:
-                                      notif.readAt == null
+                                      isUnread
                                           ? FontWeight.bold
                                           : FontWeight.normal,
-                                  fontSize: 16,
+                                  color: isDark ? Colors.white : Colors.black87,
                                 ),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          "Event: ${notif.eventTitle}",
-                          style: TextStyle(color: Colors.white70),
-                        ),
-                        if (notif.startDate != null && notif.endDate != null)
-                          Text(
-                            "Start: ${notif.startDate!.toLocal().toString().split(' ')[0]} - End: ${notif.endDate!.toLocal().toString().split(' ')[0]}",
-                            style: TextStyle(color: Colors.white70),
-                          ),
+                        const SizedBox(height: 10),
 
-                        if (notif.assignedBy.isNotEmpty)
+                        if (notif.type ==
+                            'App\\Notifications\\CreatingEventNotification') ...[
                           Text(
-                            "Assigned by: ${notif.assignedBy}",
-                            style: TextStyle(color: Colors.white70),
+                            "Event: ${notif.eventTitle}",
+                            style: TextStyle(color: Colors.teal),
                           ),
-                        if (notif.readAt != null)
+                          if (notif.startDate != null && notif.endDate != null)
+                            Text(
+                              "Start: ${DateFormat.yMMMd().format(notif.startDate!)} - End: ${DateFormat.yMMMd().format(notif.endDate!)}",
+                              style: TextStyle(
+                                color: isDark ? Colors.white70 : Colors.black54,
+                              ),
+                            ),
+                        ] else if (notif.type ==
+                            'App\\Notifications\\TeamAcceptedNotification') ...[
                           Text(
-                            "Read at: ${notif.readAt!.toLocal().toString().split('.')[0]}",
-                            style: TextStyle(
-                              color: const Color.fromARGB(255, 194, 194, 194),
-                              fontSize: 12,
+                            "Your team was ${notif.message.contains('approved') ? 'approved' : 'denied'}",
+                            style: const TextStyle(color: Colors.orangeAccent),
+                          ),
+                        ] else if (notif.type ==
+                            'App\\Notifications\\TeamAssignedNotification') ...[
+                          Text(
+                            notif.message,
+                            style: const TextStyle(
+                              color: Colors.lightBlueAccent,
                             ),
                           ),
-                        const SizedBox(height: 8),
+                          if (notif.eventTitle.isNotEmpty)
+                            Text(
+                              "Event: ${notif.eventTitle}",
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                        ],
+
+                        if (notif.readAt != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              "Read at: ${formatDateTime(notif.readAt!)}",
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Color.fromARGB(255, 180, 180, 180),
+                              ),
+                            ),
+                          ),
+
+                        const SizedBox(height: 12),
+
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            if (notif.readAt == null)
-                              IconButton(
-                                icon: const Icon(Icons.check_circle_outline),
-                                color: Colors.greenAccent,
-                                tooltip: "Mark as read",
+                            if (isUnread)
+                              TextButton.icon(
                                 onPressed: () async {
                                   await notificationService.markAsRead(
                                     notif.id,
                                   );
                                   _refreshNotifications();
                                 },
+                                icon: const Icon(
+                                  Icons.check_circle,
+                                  color: Colors.green,
+                                ),
+                                label: const Text("Mark Read"),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: Colors.green,
+                                ),
                               ),
-                            IconButton(
-                              icon: const Icon(Icons.delete_outline),
-                              color: Colors.redAccent,
-                              tooltip: "Delete",
+                            TextButton.icon(
                               onPressed: () async {
                                 await notificationService.deleteNotification(
                                   notif.id,
                                 );
                                 _refreshNotifications();
                               },
+                              icon: const Icon(
+                                Icons.delete_outline,
+                                color: Colors.redAccent,
+                              ),
+                              label: const Text("Delete"),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.redAccent,
+                              ),
                             ),
                           ],
                         ),
@@ -197,6 +244,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ),
             );
           }
+
           return const Center(
             child: CircularProgressIndicator(color: Colors.white),
           );

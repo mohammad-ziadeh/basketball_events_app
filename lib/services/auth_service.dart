@@ -123,7 +123,7 @@ class AuthService {
     );
 
     if (response.statusCode == 200) {
-      return null; // success
+      return null;
     } else {
       try {
         final error = jsonDecode(response.body);
@@ -145,12 +145,11 @@ class AuthService {
     );
 
     if (response.statusCode == 200) {
-      // Optionally refresh and save the user again
       final userResponse = await getUser();
       if (userResponse != null) {
         await _storage.write(key: 'user', value: jsonEncode(userResponse));
       }
-      return null; // success
+      return null; 
     } else {
       try {
         final error = jsonDecode(response.body);

@@ -171,9 +171,13 @@ class _EventDetailScreenState extends State<EventDetailScreen>
         phone: _enteredPhone!,
       );
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Team assigned successfully, now wait for the admin to accept your request.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Team assigned successfully, now wait for the admin to accept your request.',
+          ),
+        ),
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
@@ -380,6 +384,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                           subtitle: Text(
                             coachTeams.firstWhere(
                               (t) => t['id'] == selectedTeamId,
+                              orElse: () => {'name': 'Unknown'},
                             )['name'],
                           ),
                         ),
@@ -448,9 +453,9 @@ class _EventDetailScreenState extends State<EventDetailScreen>
     final iconColor = isDark ? Colors.white : Colors.black;
 
     final imageUrlWithVersion =
-        widget.event.imageUrl != null
+        widget.event.imageUrl?.isNotEmpty == true
             ? '${widget.event.imageUrl}?v=${widget.event.updatedAt.millisecondsSinceEpoch}'
-            : 'https://picsum.photos/600/220 ';
+            : 'https://picsum.photos/600/220';
 
     return Scaffold(
       appBar: AppBar(

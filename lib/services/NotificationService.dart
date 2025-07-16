@@ -11,6 +11,7 @@ class UserNotification {
   final String message;
   final String assignedBy;
   final DateTime? startDate;
+  final String? type;
   final DateTime? endDate;
   final String coachName;
   final DateTime? readAt;
@@ -25,16 +26,18 @@ class UserNotification {
     required this.assignedBy,
     required this.coachName,
     this.readAt,
+    this.type,
   });
 
   factory UserNotification.fromJson(Map<String, dynamic> json) {
     return UserNotification(
       id: json['id'] ?? '',
       eventId: json['event_id'] ?? 0,
-      eventTitle: json['event_title'] ?? 'No title',
-      message: json['message'] ?? '',
-      assignedBy: json['assigned_by'] ?? 'Unknown',
-      coachName: json['coach_name'] ?? 'Unknown',
+      type: json['type'] ?? '',
+      eventTitle: json['event_title'] ?? 'N/A',
+      message: json['message'] ?? 'No message',
+      assignedBy: json['assigned_by'] ?? 'System',
+      coachName: json['coach_name'] ?? 'N/A',
       startDate:
           json['start_date'] != null
               ? DateTime.tryParse(json['start_date'])
@@ -59,7 +62,6 @@ class NotificationService {
       Uri.parse('$baseUrl/api/notifications'),
       headers: {'Authorization': 'Bearer $token'},
     );
-
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
 

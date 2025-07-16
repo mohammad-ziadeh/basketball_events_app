@@ -366,6 +366,40 @@ class _TopPortionState extends State<_TopPortion> {
                       ? Image.network(
                         widget.profile!.backgroundUrl,
                         fit: BoxFit.cover,
+                        loadingBuilder: (
+                          BuildContext context,
+                          Widget child,
+                          ImageChunkEvent? loadingProgress,
+                        ) {
+                          if (loadingProgress == null) {
+                            if (isLoading) {
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (mounted) {
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                }
+                              });
+                            }
+                            return child;
+                          } else {
+                            if (!isLoading) {
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (mounted) {
+                                  setState(() {
+                                    isLoading = true;
+                                  });
+                                }
+                              });
+                            }
+                            return Container(
+                              color: Colors.grey[300],
+                              width: double.infinity,
+                              height: 300,
+                            );
+                          }
+                        },
+
                         errorBuilder: (context, error, stackTrace) {
                           return Image.asset(
                             'assets/images/profile_cover_image3.jpg',
@@ -380,6 +414,7 @@ class _TopPortionState extends State<_TopPortion> {
             ),
           ),
         ),
+
         Skeletonizer(
           enabled: isLoading,
           child: Align(
