@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:fiba_3x3/pages/landin_page/event_cards/matchup_detail_screen.dart';
 import 'package:fiba_3x3/services/matchup_events_service.dart' hide Category;
 import 'package:flutter/material.dart';
@@ -5,11 +6,11 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 
 class MatchupsWithTabs extends StatefulWidget {
-  final List<Matchup> eventMatchups;
+  final List<Matchup> eventWithMatchups;
 
   const MatchupsWithTabs({
     super.key,
-    required this.eventMatchups,
+    required this.eventWithMatchups,
     required int eventId,
   });
 
@@ -20,51 +21,93 @@ class MatchupsWithTabs extends StatefulWidget {
 class _MatchupsWithTabsState extends State<MatchupsWithTabs>
     with TickerProviderStateMixin {
   late List<String> categories;
+  late Map<String, List<String>> groupsByCategory;
+  late Map<String, List<String>> roundsByGroup;
+
   late TabController _categoryController;
-  late Map<String, List<String>> roundsByCategory;
+  late Map<String, TabController> _groupControllers;
   late Map<String, TabController> _roundControllers;
 
   @override
   void initState() {
     super.initState();
 
+    // Extract categories
     categories =
-        widget.eventMatchups
-            .map((m) => m.category?.name ?? 'Unknown')
+        widget.eventWithMatchups
+            .map((m) => m.category?.name ?? 'Unknown Category')
             .toSet()
             .toList()
           ..sort();
 
-    roundsByCategory = {};
+    groupsByCategory = {};
+    roundsByGroup = {};
 
     for (var category in categories) {
-      final rounds =
-          widget.eventMatchups
-              .where((m) => (m.category?.name ?? 'Unknown') == category)
-              .map((m) => m.round ?? 'Unknown')
+      // Groups within this category
+      final groups =
+          widget.eventWithMatchups
+              .where(
+                (m) => (m.category?.name ?? 'Unknown Category') == category,
+              )
+              .map((m) => m.groupName ?? 'Unknown Group')
               .toSet()
               .toList()
             ..sort();
-      roundsByCategory[category] = rounds;
+
+      groupsByCategory[category] = groups;
+
+      for (var group in groups) {
+        // Rounds within this group and category
+        final rounds =
+            widget.eventWithMatchups
+                .where(
+                  (m) =>
+                      (m.category?.name ?? 'Unknown Category') == category &&
+                      (m.groupName ?? 'Unknown Group') == group,
+                )
+                .map((m) => m.round ?? 'Unknown Round')
+                .toSet()
+                .toList()
+              ..sort();
+
+        roundsByGroup['$category-$group'] = rounds;
+      }
     }
 
     _categoryController = TabController(length: categories.length, vsync: this);
 
-    _roundControllers = {};
+    _groupControllers = {};
     for (var category in categories) {
-      _roundControllers[category] = TabController(
-        length: roundsByCategory[category]?.length ?? 0,
+      _groupControllers[category] = TabController(
+        length: groupsByCategory[category]?.length ?? 0,
         vsync: this,
       );
+    }
+
+    _roundControllers = {};
+    for (var category in categories) {
+      for (var group in groupsByCategory[category] ?? []) {
+        _roundControllers['$category-$group'] = TabController(
+          length: roundsByGroup['$category-$group']?.length ?? 0,
+          vsync: this,
+        );
+      }
     }
   }
 
   @override
   void dispose() {
     _categoryController.dispose();
+
+    for (var controller in _groupControllers.values) {
+      controller.dispose();
+    }
+
     for (var controller in _roundControllers.values) {
       controller.dispose();
     }
+
     super.dispose();
   }
 
@@ -86,6 +129,7 @@ class _MatchupsWithTabsState extends State<MatchupsWithTabs>
         ),
         const SizedBox(height: 12),
 
+        // Top-level Category TabBar
         TabBar(
           controller: _categoryController,
           isScrollable: true,
@@ -97,74 +141,252 @@ class _MatchupsWithTabsState extends State<MatchupsWithTabs>
 
         const SizedBox(height: 16),
 
+        // TabBarView for each category
         SizedBox(
-          height: 350,
+          height: 500,
           child: TabBarView(
             controller: _categoryController,
             children:
                 categories.map((category) {
-                  final rounds = roundsByCategory[category] ?? [];
-                  final roundController = _roundControllers[category]!;
+                  final groups = groupsByCategory[category] ?? [];
+                  String selectedGroup = groups.first;
+                  String selectedRound =
+                      roundsByGroup['$category-$selectedGroup']?.first ??
+                      'Unknown Round';
 
-                  return Column(
-                    children: [
-                      SizedBox(
-                        height: 30,
-                        child: TabBar(
-                          controller: roundController,
-                          isScrollable: true,
-                          indicatorColor: isDark ? Colors.white : Colors.black,
-                          labelColor: isDark ? Colors.white : Colors.black,
-                          unselectedLabelColor: Colors.grey,
-                          tabs:
-                              rounds.map((round) => Tab(text: round)).toList(),
-                        ),
-                      ),
+                  return StatefulBuilder(
+                    builder: (context, setInnerState) {
+                      final filteredMatchups =
+                          widget.eventWithMatchups
+                              .where(
+                                (m) =>
+                                    (m.category?.name ?? '') == category &&
+                                    (m.groupName ?? '') == selectedGroup &&
+                                    (m.round ?? '') == selectedRound,
+                              )
+                              .toList();
 
-                      const SizedBox(height: 12),
-
-                      Expanded(
-                        child: TabBarView(
-                          controller: roundController,
-                          children:
-                              rounds.map((round) {
-                                final filteredMatchups =
-                                    widget.eventMatchups
-                                        .where(
-                                          (m) =>
-                                              (m.category?.name ?? 'Unknown') ==
-                                                  category &&
-                                              (m.round ?? 'Unknown') == round,
-                                        )
-                                        .toList();
-
-                                if (filteredMatchups.isEmpty) {
-                                  return Center(
-                                    child: Text(
-                                      'No matchups for "$round"',
-                                      style: theme.textTheme.bodyMedium
-                                          ?.copyWith(color: textColor),
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Group',
+                                      style: theme.textTheme.labelLarge
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: textColor,
+                                          ),
                                     ),
-                                  );
-                                }
-
-                                return ListView(
-                                  padding: const EdgeInsets.only(top: 8),
-                                  children:
-                                      filteredMatchups
-                                          .map(
-                                            (matchup) => _buildMatchupCard(
-                                              context,
-                                              matchup,
-                                              isDark,
+                                    const SizedBox(height: 6),
+                                    DropdownButtonHideUnderline(
+                                      child: DropdownButton2<String>(
+                                        isExpanded: true,
+                                        value: selectedGroup,
+                                        items:
+                                            groups
+                                                .map(
+                                                  (group) =>
+                                                      DropdownMenuItem<String>(
+                                                        value: group,
+                                                        child: Text(
+                                                          group,
+                                                          overflow:
+                                                              TextOverflow
+                                                                  .ellipsis,
+                                                        ),
+                                                      ),
+                                                )
+                                                .toList(),
+                                        onChanged: (value) {
+                                          setInnerState(() {
+                                            selectedGroup = value!;
+                                            selectedRound =
+                                                roundsByGroup['$category-$selectedGroup']
+                                                    ?.first ??
+                                                'Unknown Round';
+                                          });
+                                        },
+                                        buttonStyleData: ButtonStyleData(
+                                          height: 50,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
                                             ),
-                                          )
-                                          .toList(),
-                                );
-                              }).toList(),
-                        ),
-                      ),
-                    ],
+                                            border: Border.all(
+                                              color:
+                                                  isDark
+                                                      ? Colors.grey[700]!
+                                                      : Colors.grey[300]!,
+                                            ),
+                                            color:
+                                                isDark
+                                                    ? Colors.grey[850]
+                                                    : Colors.white,
+                                          ),
+                                        ),
+                                        iconStyleData: IconStyleData(
+                                          icon: const Icon(
+                                            Icons.arrow_drop_down,
+                                          ),
+                                          iconSize: 24,
+                                          iconEnabledColor: textColor,
+                                        ),
+                                        dropdownStyleData: DropdownStyleData(
+                                          maxHeight: 200,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            color:
+                                                isDark
+                                                    ? Colors.grey[900]
+                                                    : Colors.white,
+                                          ),
+                                        ),
+                                        menuItemStyleData: MenuItemStyleData(
+                                          height: 42,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 12,
+                              ), // Space between the dropdowns
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Round',
+                                      style: theme.textTheme.labelLarge
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: textColor,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    DropdownButtonHideUnderline(
+                                      child: DropdownButton2<String>(
+                                        isExpanded: true,
+                                        value: selectedRound,
+                                        items:
+                                            (roundsByGroup['$category-$selectedGroup'] ??
+                                                    [])
+                                                .map(
+                                                  (round) =>
+                                                      DropdownMenuItem<String>(
+                                                        value: round,
+                                                        child: Text(
+                                                          round,
+                                                          overflow:
+                                                              TextOverflow
+                                                                  .ellipsis,
+                                                        ),
+                                                      ),
+                                                )
+                                                .toList(),
+                                        onChanged: (value) {
+                                          setInnerState(() {
+                                            selectedRound = value!;
+                                          });
+                                        },
+                                        buttonStyleData: ButtonStyleData(
+                                          height: 50,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            border: Border.all(
+                                              color:
+                                                  isDark
+                                                      ? Colors.grey[700]!
+                                                      : Colors.grey[300]!,
+                                            ),
+                                            color:
+                                                isDark
+                                                    ? Colors.grey[850]
+                                                    : Colors.white,
+                                          ),
+                                        ),
+                                        iconStyleData: IconStyleData(
+                                          icon: const Icon(
+                                            Icons.arrow_drop_down,
+                                          ),
+                                          iconSize: 24,
+                                          iconEnabledColor: textColor,
+                                        ),
+                                        dropdownStyleData: DropdownStyleData(
+                                          maxHeight: 200,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            color:
+                                                isDark
+                                                    ? Colors.grey[900]
+                                                    : Colors.white,
+                                          ),
+                                        ),
+                                        menuItemStyleData: MenuItemStyleData(
+                                          height: 42,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // Matchups List
+                          Expanded(
+                            child:
+                                filteredMatchups.isEmpty
+                                    ? Center(
+                                      child: Text(
+                                        'No matchups for "$selectedRound"',
+                                        style: theme.textTheme.bodyMedium
+                                            ?.copyWith(color: textColor),
+                                      ),
+                                    )
+                                    : ListView.builder(
+                                      padding: const EdgeInsets.only(top: 8),
+                                      itemCount: filteredMatchups.length,
+                                      itemBuilder: (context, index) {
+                                        return _buildMatchupCard(
+                                          context,
+                                          filteredMatchups[index],
+                                          isDark,
+                                        );
+                                      },
+                                    ),
+                          ),
+                        ],
+                      );
+                    },
                   );
                 }).toList(),
           ),

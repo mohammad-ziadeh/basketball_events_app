@@ -58,7 +58,6 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.teamName)),
@@ -98,15 +97,14 @@ class _TeamPlayersPageState extends State<TeamPlayersPage> {
                       },
                       child: ListTile(
                         leading: CircleAvatar(
-                          backgroundColor: isDark ? Colors.teal : Colors.amber,
                           backgroundImage:
                               player.avatarUrl.isNotEmpty
                                   ? NetworkImage(player.avatarUrl)
-                                  : null,
-                          child:
-                              (player.avatarUrl.isEmpty)
-                                  ? Text('${index + 1}')
-                                  : null,
+                                  : const AssetImage(
+                                        'assets/images/profile-male.png',
+                                      )
+                                      as ImageProvider,
+                          backgroundColor: Colors.grey.shade400,
                         ),
                         title: Text(
                           player.name,

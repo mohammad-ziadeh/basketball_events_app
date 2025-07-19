@@ -1,3 +1,4 @@
+import 'package:fiba_3x3/pages/search.dart/player_profile/player_profile_page.dart';
 import 'package:fiba_3x3/services/matchup_events_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -251,14 +252,46 @@ class _MatchupDetailScreenState extends State<MatchupDetailScreen> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
-            child: ListTile(
-              title: Text(
-                player.playerName,
-                style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
-              ),
-              subtitle: Text(
-                'Pts: ${player.points}   Ast: ${player.assists}   Fouls: ${player.fouls}',
-                style: TextStyle(color: textColor.withOpacity(0.85)),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: () {
+                final idToUse =
+                    player.userId ??
+                    player.playerId; 
+                print('Navigating to player profile with id: $idToUse');
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (context) => ReadOnlyPlayerProfilePage(
+                          playerId: idToUse,
+                          onToggleTheme: () {},
+                        ),
+                  ),
+                );
+              },
+
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundImage:
+                      player.avatarUrl.isNotEmpty
+                          ? NetworkImage(player.avatarUrl)
+                          : const AssetImage('assets/images/profile-male.png')
+                              as ImageProvider,
+                  backgroundColor: Colors.grey.shade400,
+                ),
+                title: Text(
+                  player.playerName,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: textColor,
+                  ),
+                ),
+                subtitle: Text(
+                  'Pts: ${player.points}   Ast: ${player.assists}   Fouls: ${player.fouls}',
+                  style: TextStyle(color: textColor.withOpacity(0.85)),
+                ),
               ),
             ),
           );

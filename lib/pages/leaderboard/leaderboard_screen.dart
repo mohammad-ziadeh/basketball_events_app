@@ -90,7 +90,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
   }
 
   Widget _buildPlayerCard(PlayerLeaderboardEntry player, int index) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isLoggedInPlayer =
         widget.profile != null &&
         widget.profile!.role == 'player' &&
@@ -117,12 +116,12 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
         },
         child: ListTile(
           leading: CircleAvatar(
-            backgroundColor: isDark ? Colors.teal : Colors.amber,
             backgroundImage:
                 player.avatarUrl.isNotEmpty
                     ? NetworkImage(player.avatarUrl)
-                    : null,
-            child: (player.avatarUrl.isEmpty) ? Text('${index + 1}') : null,
+                    : const AssetImage('assets/images/profile-male.png')
+                        as ImageProvider,
+            backgroundColor: Colors.grey.shade400,
           ),
           title: Text(
             player.name,
@@ -162,8 +161,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
         },
         child: ListTile(
           leading: CircleAvatar(
-            backgroundColor: isDark ? Colors.blueGrey : Colors.indigo,
-            child: Text('${index + 1}'),
+            backgroundColor: isDark ? Colors.grey.shade400 : Colors.black,
+            child: Text('${index + 1}', style: TextStyle(color: Colors.white)),
           ),
           title: Text(
             team.name,
@@ -188,9 +187,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
         title: ResponsiveAppBar(onToggleTheme: widget.onToggleTheme),
         bottom: TabBar(
           controller: _tabController,
-          labelColor: isDark ? Colors.white : Colors.black,
+          labelColor: isDark ? Colors.white : Colors.white,
           unselectedLabelColor: Colors.grey,
-          indicatorColor: isDark ? Colors.white : Colors.black,
+          indicatorColor: isDark ? Colors.white : Colors.white,
           tabs: const [Tab(text: 'Players'), Tab(text: 'Teams')],
         ),
       ),

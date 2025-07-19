@@ -29,8 +29,7 @@ class Player {
     // country: json['country'],
     gender: json['gender'],
     avatarUrl:
-        json['avatar_url'] ??
-        'http://192.168.1.159:8000/storage/profile_images/md9cZcqBcAryyOPmpIhPpjQM1OgookRnXgFlsRbj.jpg',
+        json['avatar_url'],
     ageCategory: json['age_category'],
   );
 }

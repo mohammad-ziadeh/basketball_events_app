@@ -21,9 +21,7 @@ class PlayerLeaderboardEntry {
     return PlayerLeaderboardEntry(
       playerId: json['player_id'] ?? 0,
       name: json['name'] ?? '',
-      avatarUrl:
-          json['avatar_url'] ??
-          'http://192.168.1.159:8000/storage/profile_images/md9cZcqBcAryyOPmpIhPpjQM1OgookRnXgFlsRbj.jpg',
+      avatarUrl: json['avatar_url'],
       teamName: json['team_name'] ?? '',
       points: json['points'] ?? 0,
     );

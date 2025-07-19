@@ -104,7 +104,6 @@ class _LeaderBoardPageState extends State<LeaderBoardPage>
           child: TabBarView(
             controller: _tabController,
             children: [
-              // Players Tab
               isLoadingPlayers
                   ? const Center(child: CircularProgressIndicator())
                   : playerError != null

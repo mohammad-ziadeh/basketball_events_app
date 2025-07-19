@@ -90,6 +90,8 @@ class PlayerStat {
   final int playerId;
   final String playerName;
   final int points;
+  final int? userId;
+  final String avatarUrl;
   final int assists;
   final int fouls;
 
@@ -97,6 +99,8 @@ class PlayerStat {
     required this.playerId,
     required this.playerName,
     required this.points,
+    this.userId,
+    required this.avatarUrl,
     required this.assists,
     required this.fouls,
   });
@@ -105,8 +109,10 @@ class PlayerStat {
     return PlayerStat(
       playerId: json['player_id'],
       playerName: json['player_name'],
+      userId: json['user_id'] != null ? json['user_id'] as int : null,
       points: json['points'],
       assists: json['assists'],
+      avatarUrl: json['avatar_url'] ?? '',
       fouls: json['fouls'],
     );
   }
@@ -211,6 +217,10 @@ class Category {
 class Matchup {
   final int id;
   final int eventId;
+  final int categoryId;
+  final int groupId;
+  final int teamAId;
+  final int teamBId;
   final Team teamA;
   final Team teamB;
   final DateTime? matchTime;
@@ -218,12 +228,18 @@ class Matchup {
   final String? location;
   final String? round;
   final Category? category;
+  String? groupName;
 
   Matchup({
     required this.id,
     required this.eventId,
+    required this.categoryId,
+    required this.groupId,
+    required this.teamAId,
+    required this.teamBId,
     required this.teamA,
     required this.teamB,
+    this.groupName,
     this.matchTime,
     this.start_time,
     this.location,
@@ -231,12 +247,35 @@ class Matchup {
     this.category,
   });
 
-  String get categoryName => category?.name ?? 'Unknown';
+  Matchup copyWith({String? groupName}) {
+    return Matchup(
+      id: id,
+      eventId: eventId,
+      categoryId: categoryId,
+      groupId: groupId,
+      teamAId: teamAId,
+      teamBId: teamBId,
+      teamA: teamA,
+      teamB: teamB,
+      matchTime: matchTime,
+      start_time: start_time,
+      location: location,
+      round: round,
+      category: category,
+      groupName: groupName ?? this.groupName,
+    );
+  }
+
+  String get categoryName => category?.name ?? 'Unknown Category';
 
   factory Matchup.fromJson(Map<String, dynamic> json) {
     return Matchup(
       id: json['id'],
       eventId: json['event_id'],
+      categoryId: json['category_id'],
+      groupId: json['group_id'] ?? -1,
+      teamAId: json['team_a_id'],
+      teamBId: json['team_b_id'],
       teamA: Team.fromJson(json['team_a']),
       teamB: Team.fromJson(json['team_b']),
       matchTime:
@@ -251,6 +290,7 @@ class Matchup {
       round: json['round'],
       category:
           json['category'] != null ? Category.fromJson(json['category']) : null,
+      groupName: json['group']?['name'] ?? json['group_name'] ?? null,
     );
   }
 }
@@ -259,15 +299,13 @@ class EventWithMatchups {
   final int id;
   final String title;
   final String eventCode;
-  final List<Team> teams;
-  final List<Matchup> matchups;
+  final List<CategoryWithGroups> categories;
 
   EventWithMatchups({
     required this.id,
     required this.title,
     required this.eventCode,
-    required this.teams,
-    required this.matchups,
+    required this.categories,
   });
 
   factory EventWithMatchups.fromJson(Map<String, dynamic> json) {
@@ -275,13 +313,9 @@ class EventWithMatchups {
       id: json['id'],
       title: json['title'],
       eventCode: json['event_code'],
-      teams:
-          (json['teams'] as List<dynamic>? ?? [])
-              .map((t) => Team.fromJson(t))
-              .toList(),
-      matchups:
-          (json['matchups'] as List<dynamic>? ?? [])
-              .map((m) => Matchup.fromJson(m))
+      categories:
+          (json['categories'] as List<dynamic>)
+              .map((cat) => CategoryWithGroups.fromJson(cat))
               .toList(),
     );
   }
@@ -292,12 +326,34 @@ class MatchupService {
 
   Future<List<EventWithMatchups>> fetchEventsWithMatchups() async {
     final response = await http.get(Uri.parse('$baseUrl/matchups'));
+
     if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
+      final List<dynamic> data = json.decode(response.body);
       return data.map((e) => EventWithMatchups.fromJson(e)).toList();
     } else {
       throw Exception('Failed to load matchups');
     }
+  }
+
+  List<Matchup> extractAllMatchups(List<EventWithMatchups> events) {
+    final List<Matchup> allMatchups = [];
+
+    for (var event in events) {
+      for (var category in event.categories) {
+        for (var group in category.groups) {
+          for (var matchup in group.matchups) {
+            allMatchups.add(matchup.copyWith(groupName: group.name));
+          }
+        }
+      }
+    }
+
+    // ✅ Optional: Print group names to verify
+    for (var m in allMatchups) {
+      print('Group: ${m.groupName}, Matchup ID: ${m.id}');
+    }
+
+    return allMatchups;
   }
 
   Future<Matchup> fetchMatchupDetails(int matchupId) async {
@@ -336,5 +392,57 @@ class TeamsByCat {
     } else {
       throw Exception("Failed to load teams by category");
     }
+  }
+}
+
+class CategoryWithGroups {
+  final int id;
+  final String name;
+  final List<GroupWithMatchups> groups;
+  final List<Team> teams;
+
+  CategoryWithGroups({
+    required this.id,
+    required this.name,
+    required this.groups,
+    required this.teams,
+  });
+
+  factory CategoryWithGroups.fromJson(Map<String, dynamic> json) {
+    return CategoryWithGroups(
+      id: json['id'],
+      name: json['name'],
+      groups:
+          (json['groups'] as List<dynamic>)
+              .map((group) => GroupWithMatchups.fromJson(group))
+              .toList(),
+      teams:
+          (json['teams'] as List<dynamic>)
+              .map((t) => Team.fromJson(t))
+              .toList(),
+    );
+  }
+}
+
+class GroupWithMatchups {
+  final int id;
+  final String name;
+  final List<Matchup> matchups;
+
+  GroupWithMatchups({
+    required this.id,
+    required this.name,
+    required this.matchups,
+  });
+
+  factory GroupWithMatchups.fromJson(Map<String, dynamic> json) {
+    return GroupWithMatchups(
+      id: json['id'],
+      name: json['name'],
+      matchups:
+          (json['matchups'] as List<dynamic>)
+              .map((m) => Matchup.fromJson(m))
+              .toList(),
+    );
   }
 }

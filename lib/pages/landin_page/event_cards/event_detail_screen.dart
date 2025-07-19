@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:fiba_3x3/pages/landin_page/event_cards/matchups_with_tabs.dart';
+import 'package:fiba_3x3/pages/search.dart/team_profile/team_players_page.dart';
 import 'package:fiba_3x3/services/category_service.dart';
 import 'package:fiba_3x3/services/event_service.dart';
 import 'package:fiba_3x3/services/matchup_events_service.dart' hide Category;
@@ -31,20 +32,19 @@ class _EventDetailScreenState extends State<EventDetailScreen>
   final TeamService _teamService = TeamService();
   String? userRole;
 
-  List<Matchup> eventMatchups = [];
   bool isLoadingMatchups = true;
   String? matchupError;
   late MatchupService _matchupService;
 
-  // Categories
   List<Category> categories = [];
+  List<EventWithMatchups> eventWithMatchups = [];
+  List<Matchup> allMatchups = [];
+
   int selectedCategoryId = 0;
 
-  // Step form data
   String? _enteredEmail;
   String? _enteredPhone;
 
-  // Dialog step
   int _currentStep = 1;
 
   @override
@@ -76,6 +76,20 @@ class _EventDetailScreenState extends State<EventDetailScreen>
     } catch (e) {
       print("Failed to load categories: $e");
     }
+  }
+
+  List<Matchup> extractAllMatchups(List<EventWithMatchups> events) {
+    final List<Matchup> allMatchups = [];
+
+    for (var event in events) {
+      for (var category in event.categories) {
+        for (var group in category.groups) {
+          allMatchups.addAll(group.matchups);
+        }
+      }
+    }
+
+    return allMatchups;
   }
 
   Future<void> fetchAndGroupTeams(int eventId) async {
@@ -111,20 +125,25 @@ class _EventDetailScreenState extends State<EventDetailScreen>
       matchupError = null;
     });
     try {
-      final eventWithMatchups = await _matchupService.fetchEventsWithMatchups();
-      final eventMatchup = eventWithMatchups.firstWhere(
+      final events = await _matchupService.fetchEventsWithMatchups();
+      final eventMatchup = events.firstWhere(
         (e) => e.id == widget.event.id,
         orElse:
             () => EventWithMatchups(
               id: -1,
               title: '',
               eventCode: '',
-              teams: [],
-              matchups: [],
+              categories: [],
             ),
       );
+
+      // ✅ Extract all matchups with group names
+      final allMatchups = _matchupService.extractAllMatchups(events);
+
       setState(() {
-        eventMatchups = eventMatchup.matchups;
+        categories = eventMatchup.categories.cast<Category>();
+        eventWithMatchups = events;
+        this.allMatchups = allMatchups;
         isLoadingMatchups = false;
       });
     } catch (e) {
@@ -554,7 +573,6 @@ class _EventDetailScreenState extends State<EventDetailScreen>
               ],
             ),
 
-            // Show tabs only if there are categories
             if (categories.isNotEmpty && !isRegistrationClosed)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
@@ -590,7 +608,6 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                         categories.map((category) {
                           final teams = teamsByCategory[category.id] ?? [];
 
-                          // Filter only approved teams
                           final approvedTeams =
                               teams.where((team) {
                                 return team.pivot != null &&
@@ -673,6 +690,19 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                                         return ListTile(
                                           title: Text(team.name),
                                           leading: const Icon(Icons.group),
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder:
+                                                    (_) => TeamPlayersPage(
+                                                      teamId:
+                                                          team.id, 
+                                                      teamName: team.name,
+                                                    ),
+                                              ),
+                                            );
+                                          },
                                         );
                                       },
                                     ),
@@ -698,7 +728,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                     style: const TextStyle(color: Colors.redAccent),
                   ),
                 )
-              else if (eventMatchups.isEmpty)
+              else if (eventWithMatchups.isEmpty)
                 Center(
                   child: Text(
                     'Matches will be created soon.',
@@ -711,7 +741,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                 )
               else
                 MatchupsWithTabs(
-                  eventMatchups: eventMatchups,
+                  eventWithMatchups: allMatchups,
                   eventId: widget.event.id,
                 ),
             ],
