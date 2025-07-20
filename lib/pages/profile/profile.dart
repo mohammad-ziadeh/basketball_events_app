@@ -4,7 +4,7 @@ import 'package:flutter/material.dart' hide Badge;
 import 'package:fiba_3x3/widgets/appBar.dart';
 import 'package:fiba_3x3/widgets/custom_drawer.dart';
 import 'package:fiba_3x3/pages/profile/profile_about.dart';
-// import 'package:fiba_3x3/pages/profile/profile_events.dart';
+import 'package:fiba_3x3/pages/profile/profile_events.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -29,7 +29,7 @@ class _ProfilePageState extends State<ProfilePage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _loadProfile();
     _loadLoggedInUserId();
   }
@@ -137,7 +137,7 @@ class _ProfilePageState extends State<ProfilePage>
                         unselectedLabelColor: Colors.grey,
                         tabs: const [
                           Tab(text: 'ABOUT'),
-                          // Tab(text: 'ACTIVITY'),
+                          Tab(text: 'ACTIVITY'),
                           Tab(text: 'LEADERBOARD'),
                           Tab(text: 'SOCIAL MEDIA'),
                         ],
@@ -149,7 +149,7 @@ class _ProfilePageState extends State<ProfilePage>
                         controller: _tabController,
                         children: [
                           PlayerAboutPage(profile: profile),
-                          // PlayedEventsPage(profile: profile),
+                          PlayedEventsPage(profile: profile),
                           FutureBuilder<int?>(
                             future: ProfileService.getLoggedInUserId(),
                             builder: (context, snapshot) {
@@ -433,7 +433,8 @@ class _TopPortionState extends State<_TopPortion> {
                         image: DecorationImage(
                           fit: BoxFit.cover,
                           image:
-                              widget.profile?.avatarUrl != null
+                              (widget.profile?.avatarUrl != null &&
+                                      widget.profile!.avatarUrl.isNotEmpty)
                                   ? NetworkImage(widget.profile!.avatarUrl)
                                   : const AssetImage(
                                         'assets/images/profile-male.png',
@@ -442,6 +443,7 @@ class _TopPortionState extends State<_TopPortion> {
                         ),
                       ),
                     ),
+
                     Positioned(
                       bottom: 0,
                       right: -27,

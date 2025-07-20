@@ -86,13 +86,22 @@ class AuthService {
     final token = await _storage.read(key: 'token');
     if (token == null) return null;
 
-    final response = await http.get(
-      Uri.parse('$baseUrl/api/user'),
-      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
-    );
+    try {
+      final response = await http
+          .get(
+            Uri.parse('$baseUrl/api/user'),
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Accept': 'application/json',
+            },
+          )
+          .timeout(const Duration(seconds: 5)); // <-- timeout added
 
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      }
+    } catch (e) {
+      debugPrint('getUser error: $e');
     }
 
     return null;
@@ -149,7 +158,7 @@ class AuthService {
       if (userResponse != null) {
         await _storage.write(key: 'user', value: jsonEncode(userResponse));
       }
-      return null; 
+      return null;
     } else {
       try {
         final error = jsonDecode(response.body);
@@ -159,5 +168,4 @@ class AuthService {
       }
     }
   }
-  
 }

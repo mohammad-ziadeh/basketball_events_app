@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fiba_3x3/services/auth_service.dart';
-import 'package:fiba_3x3/widgets/smoothScroll.dart';
 // ignore: unused_import
 import 'package:fiba_3x3/main.dart';
 import 'package:fiba_3x3/pages/landin_page/home.dart';
@@ -45,20 +44,16 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      scrollBehavior: MyCustomScrollBehavior(),
-      theme: ThemeData.dark(),
-      home: Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SvgPicture.asset('assets/images/3x3Logo.svg', height: 100),
-              const SizedBox(height: 20),
-              const CircularProgressIndicator(color: Colors.white),
-            ],
-          ),
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset('assets/images/3x3Logo.svg', height: 100),
+            const SizedBox(height: 20),
+            const CircularProgressIndicator(color: Colors.white),
+          ],
         ),
       ),
     );

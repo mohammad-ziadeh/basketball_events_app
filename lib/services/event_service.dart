@@ -56,6 +56,15 @@ class EventService {
       throw "Failed to load events";
     }
   }
+
+  Future<Event> fetchEventById(int id) async {
+    final response = await http.get(Uri.parse('$apiUrl/$id'));
+    if (response.statusCode == 200) {
+      return Event.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Failed to load event');
+    }
+  }
 }
 
 Future<List<Event>> fetchEvents({

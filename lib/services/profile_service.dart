@@ -60,12 +60,8 @@ class Profile {
       role: (json['role'] as String?) ?? '',
       points: json['points'] ?? 0,
       rank: (json['rank'] as String?) ?? 'N/A',
-      avatarUrl:
-          (json['avatar_url'] as String?) ??
-          'https://example.com/default-avatar.png',
-      backgroundUrl:
-          (json['background_url'] as String?) ??
-          'https://example.com/default-background.png',
+      avatarUrl: json['avatar_url'] as String? ?? '',
+      backgroundUrl: json['background_url'] as String? ?? '',
       events: events,
       badges: badges,
     );
@@ -73,23 +69,29 @@ class Profile {
 }
 
 class PlayerEvent {
+  final int eventId;
   final String eventName;
   final int points;
   final String teamName;
+  final String categoryName;
   final String dateRange;
 
   PlayerEvent({
     required this.eventName,
+    required this.eventId,
     required this.points,
     required this.teamName,
+    required this.categoryName,
     required this.dateRange,
   });
 
   factory PlayerEvent.fromJson(Map<String, dynamic> json) {
     return PlayerEvent(
+      eventId: json['event_id'],
       eventName: json['event_name'],
       points: json['points'],
       teamName: json['team_name'] ?? 'N/A',
+      categoryName: json['category_name'] ?? 'N/A',
       dateRange: json['date_range'],
     );
   }
@@ -115,7 +117,6 @@ class ProfileService {
     if (token == null) {
       throw Exception('No authentication token found.');
     }
-
     final response = await http.get(
       Uri.parse('$baseUrl/api/profile'),
       headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
@@ -176,4 +177,5 @@ class ProfileService {
 
     return null;
   }
+  
 }
