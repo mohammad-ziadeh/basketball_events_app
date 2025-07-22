@@ -1,7 +1,5 @@
 import 'dart:async';
-
 import 'package:fiba_3x3/pages/landin_page/event_cards/event_detail_screen.dart';
-import 'package:fiba_3x3/pages/landin_page/event_cards/past_event_detail_screen.dart';
 import 'package:fiba_3x3/services/event_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -397,7 +395,7 @@ class _SearchEventState extends State<SearchEvent>
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => PastEventDetailScreen(event: event),
+                    builder: (context) => EventDetailScreen(event: event),
                   ),
                 );
               }
