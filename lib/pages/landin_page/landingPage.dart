@@ -1,8 +1,7 @@
-// ignore_for_file: file_names
 import 'package:flutter/material.dart';
-import 'package:fiba_3x3/pages/landin_page/carousel.dart';
-import 'package:fiba_3x3/pages/landin_page/event_cards/cards.dart';
-import 'package:fiba_3x3/pages/landin_page/socialIcons.dart';
+import 'carousel.dart';
+import 'event_cards/cards.dart';
+import 'socialIcons.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -12,33 +11,36 @@ class MainPage extends StatefulWidget {
 }
 
 class MainPageState extends State<MainPage> {
+  final GlobalKey<CarouselWidgetState> _carouselKey =
+      GlobalKey<CarouselWidgetState>();
   final GlobalKey<EventCardState> _eventCardKey = GlobalKey<EventCardState>();
 
-  Future<void> refreshEventCard() async {
-    await _eventCardKey.currentState?.refreshEvents();
+  Future<void> refreshAll() async {
+    await Future.wait([
+      _carouselKey.currentState?.fetchData() ?? Future.value(),
+      _eventCardKey.currentState?.refreshEvents() ?? Future.value(),
+    ]);
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CarouselWidget(),
-          const SizedBox(height: 40),
-          const Center(
-            child: Text(
-              'NEXT EVENTS',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.w900),
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CarouselWidget(key: _carouselKey),
+        const SizedBox(height: 40),
+        const Center(
+          child: Text(
+            'NEXT EVENTS',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.w900),
           ),
-          const SizedBox(height: 40),
-          EventCard(key: _eventCardKey),
-          SocialFollowSection(),
-          const SizedBox(height: 40),
-        ],
-      ),
+        ),
+        const SizedBox(height: 40),
+        EventCard(key: _eventCardKey),
+        SocialFollowSection(),
+        const SizedBox(height: 40),
+      ],
     );
   }
 }

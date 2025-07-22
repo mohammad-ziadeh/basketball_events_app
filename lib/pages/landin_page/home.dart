@@ -14,10 +14,10 @@ class Home extends StatefulWidget {
 }
 
 class HomeState extends State<Home> {
-final GlobalKey<MainPageState> _mainPageKey = GlobalKey<MainPageState>();
+  final GlobalKey<MainPageState> _mainPageKey = GlobalKey<MainPageState>();
 
   Future<void> _refreshPage() async {
-    await _mainPageKey.currentState?.refreshEventCard();
+    await _mainPageKey.currentState?.refreshAll();
   }
 
   @override

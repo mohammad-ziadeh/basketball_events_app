@@ -194,10 +194,10 @@ class _BadgesRow extends StatelessWidget {
 
   final Map<String, int> _pointsRequired = {
     'Rookie': 0,
-    'Pro Player': 35,
-    'All-Star': 70,
-    'Elite': 100,
-    'Legend': 150,
+    'Pro Player': 75,
+    'All-Star': 120,
+    'Elite': 200,
+    'Legend': 350,
   };
 
   _BadgesRow({required this.badges});
@@ -362,7 +362,8 @@ class _TopPortionState extends State<_TopPortion> {
               height: 300,
               margin: const EdgeInsets.only(bottom: 60),
               child:
-                  widget.profile?.backgroundUrl != null
+                  (widget.profile?.backgroundUrl != null &&
+                          widget.profile!.backgroundUrl.isNotEmpty)
                       ? Image.network(
                         widget.profile!.backgroundUrl,
                         fit: BoxFit.cover,
@@ -399,7 +400,6 @@ class _TopPortionState extends State<_TopPortion> {
                             );
                           }
                         },
-
                         errorBuilder: (context, error, stackTrace) {
                           return Image.asset(
                             'assets/images/profile_cover_image3.jpg',
@@ -414,7 +414,6 @@ class _TopPortionState extends State<_TopPortion> {
             ),
           ),
         ),
-
         Skeletonizer(
           enabled: isLoading,
           child: Align(
@@ -443,7 +442,6 @@ class _TopPortionState extends State<_TopPortion> {
                         ),
                       ),
                     ),
-
                     Positioned(
                       bottom: 0,
                       right: -27,

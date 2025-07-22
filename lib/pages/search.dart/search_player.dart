@@ -304,7 +304,7 @@ class _SearchPlayerState extends State<SearchPlayer>
                         radius: 20,
                         backgroundColor: Colors.grey.shade400,
                         backgroundImage:
-                            (player.avatarUrl.isNotEmpty)
+                            (player.avatarUrl.trim().isNotEmpty)
                                 ? NetworkImage(player.avatarUrl)
                                 : const AssetImage(
                                       'assets/images/profile-male.png',

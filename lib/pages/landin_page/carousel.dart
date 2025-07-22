@@ -1,77 +1,128 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fiba_3x3/services/carousel_service.dart';
 import 'package:flutter/material.dart';
 
 class CarouselWidget extends StatefulWidget {
   const CarouselWidget({super.key});
 
   @override
-  _CarouselWidgetState createState() => _CarouselWidgetState();
+  CarouselWidgetState createState() => CarouselWidgetState();
 }
 
-class _CarouselWidgetState extends State<CarouselWidget> {
-  final PageController _controller = PageController();
+class CarouselWidgetState extends State<CarouselWidget> {
+  late PageController _controller;
   int currentPage = 0;
 
-  final List<String> images = [
-    'assets/images/3x3one.png',
-    'assets/images/3x3two.jpeg',
-    'assets/images/3x3three.jpeg',
-  ];
-  final List<Map<String, String>> carouselContent = [
-    {
-      'tag': '3X3 BASKETBALL',
-      'title': 'POLAND TO HOST FIBA\n3X3 WORLD CUP 2026',
-    },
-    {'tag': 'FIBA NEWS', 'title': 'TOP TEAMS FROM AROUND\nTHE WORLD COMPETE'},
-    {
-      'tag': 'SPORTS EVENT',
-      'title': 'FAST-PACED ACTION AND\nGLOBAL COMPETITION',
-    },
-  ];
+  List<Carousel> carouselData = [];
+  bool isLoading = true;
+  String? errorMessage;
 
-  late final autoPlayInterval = const Duration(seconds: 15);
+  final Duration autoPlayInterval = const Duration(seconds: 15);
+  bool _autoPlayRunning = false;
 
   @override
   void initState() {
     super.initState();
-
-    Future.delayed(Duration.zero, () {
-      startAutoPlay();
-    });
-  }
-
-  void startAutoPlay() async {
-    while (true) {
-      await Future.delayed(autoPlayInterval);
-
-      if (currentPage < images.length - 1) {
-        await _controller.nextPage(
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
-        currentPage++;
-      } else {
-        await _controller.animateToPage(
-          0,
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
-        currentPage = 0;
-      }
-    }
+    _controller = PageController();
+    fetchData();
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _autoPlayRunning = false;
     super.dispose();
+  }
+
+  Future<void> fetchData() async {
+    setState(() {
+      if (carouselData.isEmpty) isLoading = true;
+      errorMessage = null;
+    });
+
+    try {
+      final data = await CarouselService.fetchCarouselData();
+
+      _controller.dispose();
+      _controller = PageController();
+
+      setState(() {
+        carouselData = data;
+        isLoading = false;
+        currentPage = 0;
+      });
+
+      if (!_autoPlayRunning) {
+        _autoPlayRunning = true;
+        startAutoPlay();
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        if (carouselData.isEmpty) {
+          errorMessage = 'Failed to load carousel data. Please try again.';
+        }
+      });
+
+      if (mounted && carouselData.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to refresh carousel data.')),
+        );
+      }
+    }
+  }
+
+  void startAutoPlay() async {
+    while (mounted && _autoPlayRunning) {
+      await Future.delayed(autoPlayInterval);
+
+      if (!mounted || carouselData.isEmpty) return;
+
+      if (currentPage < carouselData.length - 1) {
+        _controller.nextPage(
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+        setState(() => currentPage++);
+      } else {
+        _controller.animateToPage(
+          0,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+        setState(() => currentPage = 0);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final double imageHeight = MediaQuery.of(context).size.height * 0.45;
+
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (errorMessage != null) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              errorMessage!,
+              style: const TextStyle(color: Colors.red, fontSize: 18),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(onPressed: fetchData, child: const Text('Retry')),
+          ],
+        ),
+      );
+    }
+
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 1050, maxHeight: 700),
-
         child: SizedBox(
           height: MediaQuery.of(context).size.height * 0.6,
           child: Stack(
@@ -79,23 +130,53 @@ class _CarouselWidgetState extends State<CarouselWidget> {
             children: [
               PageView.builder(
                 controller: _controller,
-                itemCount: images.length,
+                itemCount: carouselData.length,
                 onPageChanged: (index) {
-                  setState(() {
-                    currentPage = index;
-                  });
+                  setState(() => currentPage = index);
                 },
                 itemBuilder: (context, index) {
-                  return ClipRRect(
-                    child: Image.asset(
-                      images[index],
+                  final item = carouselData[index];
+
+                  final imageUrl =
+                      (item.imageUrl != null &&
+                              item.imageUrl!.trim().isNotEmpty)
+                          ? '${item.imageUrl}?refresh=${item.updatedAt}'
+                          : 'https://picsum.photos/600/220';
+
+                  return SizedBox(
+                    width: double.infinity,
+                    height: imageHeight,
+                    child: CachedNetworkImage(
+                      imageUrl: imageUrl,
                       fit: BoxFit.cover,
-                      width: double.infinity,
+                      placeholder:
+                          (context, url) => Container(
+                            width: double.infinity,
+                            height: imageHeight,
+                            color: Colors.grey[300],
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                      errorWidget:
+                          (context, url, error) => Container(
+                            width: double.infinity,
+                            height: imageHeight,
+                            color: Colors.grey[300],
+                            child: const Center(
+                              child: Icon(
+                                Icons.broken_image,
+                                size: 50,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
                     ),
                   );
                 },
               ),
 
+              // Title Box
               Positioned(
                 bottom: 60,
                 left: 0,
@@ -116,7 +197,7 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                         children: [
                           const SizedBox(height: 20),
                           Text(
-                            carouselContent[currentPage]['title']!,
+                            carouselData[currentPage].title,
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               fontSize: 22,
@@ -131,6 +212,8 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                   ),
                 ),
               ),
+
+              // Tag Box
               Positioned(
                 top: MediaQuery.of(context).size.height * 0.405,
                 left: 0,
@@ -146,7 +229,7 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      carouselContent[currentPage]['tag']!,
+                      carouselData[currentPage].tag,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -157,7 +240,7 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                 ),
               ),
 
-              // Nav Arrows
+              // Navigation Arrows
               Positioned(
                 top: 0,
                 left: 16,
@@ -166,50 +249,23 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
-                        color: Colors.black.withOpacity(0.3),
-                      ),
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.arrow_back_ios_new,
-                          size: 25,
-                          color: Colors.white,
-                        ),
-                        onPressed:
-                            () => _controller.previousPage(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            ),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
-                        color: Colors.black.withOpacity(0.3),
-                      ),
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.arrow_forward_ios,
-                          size: 25,
-                          color: Colors.white,
-                        ),
-                        onPressed:
-                            () => _controller.nextPage(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            ),
-                      ),
-                    ),
+                    _navArrow(Icons.arrow_back_ios_new, () {
+                      _controller.previousPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    }),
+                    _navArrow(Icons.arrow_forward_ios, () {
+                      _controller.nextPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    }),
                   ],
                 ),
               ),
 
+              // Page Indicator
               Positioned(
                 bottom: 20,
                 left: 0,
@@ -217,7 +273,7 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children:
-                      images.asMap().entries.map((entry) {
+                      carouselData.asMap().entries.map((entry) {
                         return Container(
                           width: 10,
                           height: 10,
@@ -239,6 +295,21 @@ class _CarouselWidgetState extends State<CarouselWidget> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _navArrow(IconData icon, VoidCallback onPressed) {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white, width: 2),
+        color: Colors.black.withOpacity(0.3),
+      ),
+      child: IconButton(
+        icon: Icon(icon, size: 25, color: Colors.white),
+        onPressed: onPressed,
       ),
     );
   }
