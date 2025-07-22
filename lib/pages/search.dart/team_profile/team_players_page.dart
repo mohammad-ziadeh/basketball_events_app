@@ -9,10 +9,10 @@ class TeamPlayersPage extends StatefulWidget {
   final String teamName;
 
   const TeamPlayersPage({
-    Key? key,
+    super.key,
     required this.teamId,
     required this.teamName,
-  }) : super(key: key);
+  });
 
   @override
   State<TeamPlayersPage> createState() => _TeamPlayersPageState();

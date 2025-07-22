@@ -67,7 +67,6 @@ class _BasketballNewsPageState extends State<BasketballNewsPage> {
   }
 
   void _openArticle(String url) async {
-    print('Attempting to open URL: $url');
 
     if (url.isEmpty) {
       ScaffoldMessenger.of(

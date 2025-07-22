@@ -290,7 +290,7 @@ class Matchup {
       round: json['round'],
       category:
           json['category'] != null ? Category.fromJson(json['category']) : null,
-      groupName: json['group']?['name'] ?? json['group_name'] ?? null,
+      groupName: json['group']?['name'] ?? json['group_name'],
     );
   }
 }
@@ -346,11 +346,6 @@ class MatchupService {
           }
         }
       }
-    }
-
-    // ✅ Optional: Print group names to verify
-    for (var m in allMatchups) {
-      print('Group: ${m.groupName}, Matchup ID: ${m.id}');
     }
 
     return allMatchups;

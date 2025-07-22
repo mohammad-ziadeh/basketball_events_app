@@ -47,7 +47,6 @@ class _ProfilePageState extends State<ProfilePage>
       setState(() {
         isLoading = false;
       });
-      print("Failed to load profile: $e");
     }
   }
 

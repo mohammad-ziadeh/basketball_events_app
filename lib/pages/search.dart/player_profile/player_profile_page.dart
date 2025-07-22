@@ -56,7 +56,6 @@ class _ReadOnlyPlayerProfilePageState extends State<ReadOnlyPlayerProfilePage>
         });
       }
     } catch (e) {
-      print('Error loading player: $e');
       if (mounted) setState(() => isLoading = false);
     }
   }

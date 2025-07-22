@@ -66,7 +66,6 @@ class _SearchEventState extends State<SearchEvent>
         _fetchEvents('ongoing');
         _fetchEvents('past');
       } catch (e) {
-        print('Suggestion fetch error: $e');
         setState(() => _suggestions = []);
       }
     });

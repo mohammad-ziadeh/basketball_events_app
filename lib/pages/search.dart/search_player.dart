@@ -66,7 +66,6 @@ class _SearchPlayerState extends State<SearchPlayer>
         });
         _fetchPlayers(search: query);
       } catch (e) {
-        print('Error fetching suggestions: $e');
         setState(() {
           _suggestions = [];
         });

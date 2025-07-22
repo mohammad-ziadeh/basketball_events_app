@@ -258,7 +258,6 @@ class _MatchupDetailScreenState extends State<MatchupDetailScreen> {
                 final idToUse =
                     player.userId ??
                     player.playerId; 
-                print('Navigating to player profile with id: $idToUse');
 
                 Navigator.push(
                   context,

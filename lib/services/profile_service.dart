@@ -3,6 +3,7 @@ import 'package:fiba_3x3/services/api_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:fiba_3x3/services/storage_service.dart';
 import 'package:flutter/foundation.dart';
+// ignore: depend_on_referenced_packages
 import 'package:http_parser/http_parser.dart';
 import 'dart:io';
 
