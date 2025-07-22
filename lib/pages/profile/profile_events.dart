@@ -59,7 +59,7 @@ class _PlayedEventsPageState extends State<PlayedEventsPage> {
             DataColumn(label: Text('DATE')),
             DataColumn(label: Text('CATEGORY')),
             DataColumn(label: Text('TEAM')),
-            DataColumn(label: Text('RANKING POINTS')),
+            DataColumn(label: Text('TEAM POINTS')),
           ],
           rows: List.generate(isLoading ? 4 : events.length, (index) {
             final event =
@@ -68,7 +68,7 @@ class _PlayedEventsPageState extends State<PlayedEventsPage> {
                       eventName: 'Loading...',
                       points: 0,
                       teamName: 'Loading...',
-                      dateRange: 'Loading...',
+                      startDate: 'Loading...',
                       categoryName: 'Loading...',
                       eventId: 0,
                     )
@@ -98,7 +98,7 @@ class _PlayedEventsPageState extends State<PlayedEventsPage> {
               },
               cells: [
                 DataCell(Text(event.eventName)),
-                DataCell(Text(event.dateRange)),
+                DataCell(Text(event.startDate)),
                 DataCell(Text(event.categoryName)),
                 DataCell(Text(event.teamName)),
                 DataCell(Text(event.points.toString())),

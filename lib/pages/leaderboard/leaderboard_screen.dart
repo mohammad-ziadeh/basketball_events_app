@@ -1,5 +1,6 @@
 import 'package:fiba_3x3/pages/search.dart/player_profile/player_profile_page.dart';
 import 'package:fiba_3x3/pages/search.dart/team_profile/team_players_page.dart';
+import 'package:fiba_3x3/widgets/custom_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:fiba_3x3/services/leader_board_service.dart';
 import 'package:fiba_3x3/services/profile_service.dart';
@@ -229,6 +230,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
               ),
         ],
       ),
+      endDrawer: const CustomDrawer(),
     );
   }
 }

@@ -285,7 +285,7 @@ class _SearchPlayerState extends State<SearchPlayer>
                 builder:
                     (_) => ReadOnlyPlayerProfilePage(
                       playerId: player.id,
-                  
+
                       onToggleTheme: widget.onToggleTheme,
                     ),
               ),
@@ -302,6 +302,7 @@ class _SearchPlayerState extends State<SearchPlayer>
                     children: [
                       CircleAvatar(
                         radius: 20,
+                        backgroundColor: Colors.grey.shade400,
                         backgroundImage:
                             (player.avatarUrl.isNotEmpty)
                                 ? NetworkImage(player.avatarUrl)

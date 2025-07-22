@@ -67,21 +67,29 @@ class PlayerEvent {
   final String eventName;
   final int points;
   final String teamName;
-  final String dateRange;
-
+  // final String dateRange;
+  final String startDate;
+  final int eventId;
+  final String categoryName;
   PlayerEvent({
     required this.eventName,
     required this.points,
+    required this.categoryName,
+    required this.eventId,
     required this.teamName,
-    required this.dateRange,
+    // required this.dateRange,
+    required this.startDate,
   });
 
   factory PlayerEvent.fromJson(Map<String, dynamic> json) {
     return PlayerEvent(
       eventName: json['event_name'] ?? 'N/A',
       points: json['points'] ?? 0,
+      eventId: json['event_id'] ?? 0,
       teamName: json['team_name'] ?? 'N/A',
-      dateRange: json['date_range'] ?? 'N/A',
+      startDate: json['start_date'] ?? 'N/A',
+      // dateRange: json['date_range'] ?? 'N/A',
+      categoryName: json['category_name'] ?? 'N/A',
     );
   }
 }
@@ -118,7 +126,7 @@ class EventInfo {
       eventName: json['event_name'],
       points: json['points'],
       teamName: json['team_name'],
-      dateRange: json['date_range'],
+      dateRange: json['start_date'],
     );
   }
 }
@@ -129,9 +137,7 @@ class PlayerService {
   static Future<Player> fetchPlayerProfile(int id) async {
     final response = await http.get(
       Uri.parse('$baseUrl/$id'),
-      headers: {
-        'Accept': 'application/json',
-      },
+      headers: {'Accept': 'application/json'},
     );
 
     if (response.statusCode == 200) {

@@ -1,5 +1,5 @@
 import 'package:fiba_3x3/pages/search.dart/player_profile/profile_about.dart';
-// import 'package:fiba_3x3/pages/search.dart/player_profile/profile_events.dart';
+import 'package:fiba_3x3/pages/search.dart/player_profile/profile_events.dart';
 import 'package:fiba_3x3/pages/search.dart/player_profile/profile_leader_board.dart';
 import 'package:fiba_3x3/services/players_profile_service.dart';
 import 'package:flutter/material.dart' hide Badge;
@@ -34,7 +34,7 @@ class _ReadOnlyPlayerProfilePageState extends State<ReadOnlyPlayerProfilePage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
 
     if (widget.player != null) {
       player = widget.player;
@@ -120,7 +120,7 @@ class _ReadOnlyPlayerProfilePageState extends State<ReadOnlyPlayerProfilePage>
                               unselectedLabelColor: Colors.grey,
                               tabs: const [
                                 Tab(text: 'ABOUT'),
-                                // Tab(text: 'ACTIVITY'),
+                                Tab(text: 'ACTIVITY'),
                                 Tab(text: 'LEADERBOARD'),
                                 Tab(text: 'SOCIAL MEDIA'),
                               ],
@@ -132,7 +132,7 @@ class _ReadOnlyPlayerProfilePageState extends State<ReadOnlyPlayerProfilePage>
                               controller: _tabController,
                               children: [
                                 PlayerAboutPage(player: player),
-                                // PlayedEventsPage(player: player),
+                                PlayedEventsPage(player: player),
                                 LeaderBoardPage(
                                   player: player,
                                   loggedInPlayerId: player!.id,

@@ -74,7 +74,8 @@ class PlayerEvent {
   final int points;
   final String teamName;
   final String categoryName;
-  final String dateRange;
+  // final String dateRange;
+  final String startDate;
 
   PlayerEvent({
     required this.eventName,
@@ -82,7 +83,8 @@ class PlayerEvent {
     required this.points,
     required this.teamName,
     required this.categoryName,
-    required this.dateRange,
+    // required this.dateRange,
+    required this.startDate,
   });
 
   factory PlayerEvent.fromJson(Map<String, dynamic> json) {
@@ -92,7 +94,8 @@ class PlayerEvent {
       points: json['points'],
       teamName: json['team_name'] ?? 'N/A',
       categoryName: json['category_name'] ?? 'N/A',
-      dateRange: json['date_range'],
+      startDate: json['date_range'] ?? 'N/A',
+      // dateRange: json['date_range'] ?? 'N/A',
     );
   }
 }
@@ -177,5 +180,4 @@ class ProfileService {
 
     return null;
   }
-  
 }
