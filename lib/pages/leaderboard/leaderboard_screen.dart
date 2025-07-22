@@ -183,51 +183,59 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: ResponsiveAppBar(onToggleTheme: widget.onToggleTheme),
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: isDark ? Colors.white : Colors.white,
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: isDark ? Colors.white : Colors.white,
-          tabs: const [Tab(text: 'Players'), Tab(text: 'Teams')],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
+      appBar: ResponsiveAppBar(onToggleTheme: widget.onToggleTheme),
+      body: Column(
         children: [
-          // Players Tab
-          isLoadingPlayers
-              ? const Center(child: CircularProgressIndicator())
-              : playerError != null
-              ? Center(child: Text('Error: $playerError'))
-              : RefreshIndicator(
-                onRefresh: _loadPlayerLeaderboard,
-                child: ListView.builder(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: playerLeaderboard.length,
-                  itemBuilder:
-                      (context, index) =>
-                          _buildPlayerCard(playerLeaderboard[index], index),
-                ),
-              ),
+          Material(
+            color: Theme.of(context).appBarTheme.backgroundColor,
+            child: TabBar(
+              controller: _tabController,
+              labelColor: isDark ? Colors.white : Colors.black,
+              unselectedLabelColor: Colors.grey,
+              indicatorColor: isDark ? Colors.white : Colors.black,
+              tabs: const [Tab(text: 'Players'), Tab(text: 'Teams')],
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                // Players
+                isLoadingPlayers
+                    ? const Center(child: CircularProgressIndicator())
+                    : playerError != null
+                    ? Center(child: Text('Error: $playerError'))
+                    : RefreshIndicator(
+                      onRefresh: _loadPlayerLeaderboard,
+                      child: ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        itemCount: playerLeaderboard.length,
+                        itemBuilder:
+                            (context, index) => _buildPlayerCard(
+                              playerLeaderboard[index],
+                              index,
+                            ),
+                      ),
+                    ),
 
-          // Teams Tab
-          isLoadingTeams
-              ? const Center(child: CircularProgressIndicator())
-              : teamError != null
-              ? Center(child: Text('Error: $teamError'))
-              : RefreshIndicator(
-                onRefresh: _loadTeamLeaderboard,
-                child: ListView.builder(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: teamLeaderboard.length,
-                  itemBuilder:
-                      (context, index) =>
-                          _buildTeamCard(teamLeaderboard[index], index),
-                ),
-              ),
+                // Teams
+                isLoadingTeams
+                    ? const Center(child: CircularProgressIndicator())
+                    : teamError != null
+                    ? Center(child: Text('Error: $teamError'))
+                    : RefreshIndicator(
+                      onRefresh: _loadTeamLeaderboard,
+                      child: ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        itemCount: teamLeaderboard.length,
+                        itemBuilder:
+                            (context, index) =>
+                                _buildTeamCard(teamLeaderboard[index], index),
+                      ),
+                    ),
+              ],
+            ),
+          ),
         ],
       ),
       endDrawer: const CustomDrawer(),

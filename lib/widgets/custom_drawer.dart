@@ -73,7 +73,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       Navigator.of(context).pushNamed('/profile');
                     },
                   ),
-                  _DrawerMenuItem(title: '3x3'),
                   _DrawerMenuItem(
                     title: 'EVENTS',
                     onTap: () {
