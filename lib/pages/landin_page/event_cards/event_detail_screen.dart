@@ -8,10 +8,11 @@ import 'package:fiba_3x3/services/matchup_events_service.dart' hide Category;
 import 'package:fiba_3x3/services/team_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+// Assuming you are using easy_localization or a similar package
+import 'package:easy_localization/easy_localization.dart'; // Make sure this import matches your localization package
 
 class EventDetailScreen extends StatefulWidget {
   final Event event;
-
   const EventDetailScreen({super.key, required this.event});
 
   @override
@@ -31,28 +32,21 @@ class _EventDetailScreenState extends State<EventDetailScreen>
   final DateFormat dateFormat = DateFormat('yyyy-MM-dd');
   final TeamService _teamService = TeamService();
   String? userRole;
-
   bool isLoadingMatchups = true;
   String? matchupError;
   late MatchupService _matchupService;
-
   List<Category> categories = [];
   List<EventWithMatchups> eventWithMatchups = [];
   List<Matchup> allMatchups = [];
-
   int selectedCategoryId = 0;
-
   String? _enteredEmail;
   String? _enteredPhone;
-
   int _currentStep = 1;
 
   @override
   void initState() {
     super.initState();
-
     _matchupService = MatchupService();
-
     _loadUserRole();
     _loadCoachTeams();
     _loadMatchups();
@@ -71,7 +65,6 @@ class _EventDetailScreenState extends State<EventDetailScreen>
       setState(() {
         categories = cats;
       });
-
       await fetchAndGroupTeams(widget.event.id);
     } catch (e) {
       print("Failed to load categories: $e");
@@ -80,7 +73,6 @@ class _EventDetailScreenState extends State<EventDetailScreen>
 
   List<Matchup> extractAllMatchups(List<EventWithMatchups> events) {
     final List<Matchup> allMatchups = [];
-
     for (var event in events) {
       for (var category in event.categories) {
         for (var group in category.groups) {
@@ -88,7 +80,6 @@ class _EventDetailScreenState extends State<EventDetailScreen>
         }
       }
     }
-
     return allMatchups;
   }
 
@@ -136,10 +127,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
               categories: [],
             ),
       );
-
-      // ✅ Extract all matchups with group names
       final allMatchups = _matchupService.extractAllMatchups(events);
-
       setState(() {
         categories = eventMatchup.categories.cast<Category>();
         eventWithMatchups = events;
@@ -177,7 +165,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
     if (selectedTeamId == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Please select a team')));
+      ).showSnackBar(SnackBar(content: Text('please_select_a_team'.tr())));
       return;
     }
     setState(() => isAssigning = true);
@@ -189,17 +177,15 @@ class _EventDetailScreenState extends State<EventDetailScreen>
         email: _enteredEmail!,
         phone: _enteredPhone!,
       );
-
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Team assigned successfully, now wait for the admin to accept your request.',
-          ),
-        ),
+        SnackBar(content: Text('team_assigned_successfully_message'.tr())),
       );
     } catch (e) {
+      // Note: Backend errors might need mapping to keys for full translation
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+        SnackBar(
+          content: Text(e.toString().replaceFirst('Exception: ', '').tr()),
+        ), // Or map e.toString() to a key
       );
     } finally {
       setState(() => isAssigning = false);
@@ -211,7 +197,6 @@ class _EventDetailScreenState extends State<EventDetailScreen>
     selectedTeamId = null;
     _enteredEmail = null;
     _enteredPhone = null;
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -225,42 +210,38 @@ class _EventDetailScreenState extends State<EventDetailScreen>
 
             void validateStep2AndProceed() {
               bool isValid = true;
-
               setStateSB(() {
                 if (selectedTeamId == null) {
-                  selectedTeamIdError = 'Please select a team';
+                  selectedTeamIdError = 'please_select_a_team'.tr();
                   isValid = false;
                 } else {
                   selectedTeamIdError = null;
                 }
-
                 if (_enteredEmail == null || _enteredEmail!.isEmpty) {
-                  emailError = 'Email is required';
+                  emailError = 'email_is_required'.tr();
                   isValid = false;
                 } else {
                   final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
                   if (!emailRegex.hasMatch(_enteredEmail!)) {
-                    emailError = 'Enter a valid email address';
+                    emailError = 'enter_valid_email'.tr();
                     isValid = false;
                   } else {
                     emailError = null;
                   }
                 }
-
                 if (_enteredPhone == null || _enteredPhone!.isEmpty) {
-                  phoneError = 'Phone number is required';
+                  phoneError = 'phone_number_is_required'.tr();
                   isValid = false;
                 } else {
                   final phoneRegex = RegExp(r'^\+?[0-9]{7,15}$');
                   if (!phoneRegex.hasMatch(_enteredPhone!)) {
-                    phoneError = 'Enter a valid phone number';
+                    phoneError = 'enter_valid_phone'.tr();
                     isValid = false;
                   } else {
                     phoneError = null;
                   }
                 }
               });
-
               if (isValid) {
                 setStateSB(() => _currentStep++);
               }
@@ -285,7 +266,12 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                     ),
                   ),
                   Text(
-                    'Step $_currentStep of 3',
+                    'step_of_3'.tr(
+                      namedArgs: {
+                        'step': _currentStep.toString(),
+                        'total': '3',
+                      },
+                    ),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -296,13 +282,13 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Welcome!',
+                          'welcome'.tr(),
                           style: Theme.of(context).textTheme.titleLarge
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          'You are about to assign a team to this event. Please follow these steps.',
+                          'assign_team_instructions'.tr(),
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ],
@@ -312,7 +298,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Select Team & Provide Contact Info',
+                          'select_team_contact_info'.tr(),
                           style: Theme.of(context).textTheme.titleLarge
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
@@ -321,7 +307,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                           child: DropdownButton2<int>(
                             isExpanded: true,
                             hint: Text(
-                              'Select your team',
+                              'select_your_team'.tr(),
                               style: TextStyle(
                                 color: Theme.of(context).hintColor,
                               ),
@@ -332,7 +318,9 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                                     .map(
                                       (team) => DropdownMenuItem<int>(
                                         value: team['id'] as int,
-                                        child: Text(team['name']),
+                                        child: Text(
+                                          team['name'],
+                                        ), // Team name is dynamic
                                       ),
                                     )
                                     .toList(),
@@ -362,7 +350,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                         TextField(
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
-                            hintText: "Email",
+                            hintText: "email_hint".tr(),
                             errorText: emailError,
                           ),
                           onChanged: (value) {
@@ -376,7 +364,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                         TextField(
                           keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
-                            hintText: "Phone",
+                            hintText: "phone_hint".tr(),
                             errorText: phoneError,
                           ),
                           onChanged: (value) {
@@ -393,26 +381,26 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Confirm Details',
+                          'confirm_details'.tr(),
                           style: Theme.of(context).textTheme.titleLarge
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 15),
                         ListTile(
-                          title: const Text("Team"),
+                          title: Text("team_label".tr()),
                           subtitle: Text(
                             coachTeams.firstWhere(
                               (t) => t['id'] == selectedTeamId,
-                              orElse: () => {'name': 'Unknown'},
+                              orElse: () => {'name': 'unknown_team'.tr()},
                             )['name'],
                           ),
                         ),
                         ListTile(
-                          title: const Text("Email"),
+                          title: Text("email_label".tr()),
                           subtitle: Text(_enteredEmail ?? ""),
                         ),
                         ListTile(
-                          title: const Text("Phone"),
+                          title: Text("phone_label".tr()),
                           subtitle: Text(_enteredPhone ?? ""),
                         ),
                       ],
@@ -426,7 +414,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                           onPressed: () {
                             setStateSB(() => _currentStep = _currentStep - 1);
                           },
-                          child: const Text("Back"),
+                          child: Text("back_button".tr()),
                         ),
                       ElevatedButton(
                         onPressed: () {
@@ -448,7 +436,11 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                                     strokeWidth: 2,
                                   ),
                                 )
-                                : Text(_currentStep < 3 ? "Next" : "Submit"),
+                                : Text(
+                                  _currentStep < 3
+                                      ? "next_button".tr()
+                                      : "submit_button".tr(),
+                                ),
                       ),
                     ],
                   ),
@@ -479,7 +471,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.event.title,
+          widget.event.title, // Dynamic title
           style: const TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.black,
@@ -524,7 +516,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
             ),
             const SizedBox(height: 20),
             Text(
-              widget.event.title,
+              widget.event.title, // Dynamic title
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: textColor,
@@ -537,7 +529,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    widget.event.location,
+                    widget.event.location, // Dynamic location
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: secondaryTextColor,
                     ),
@@ -551,7 +543,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                 Icon(Icons.date_range, color: iconColor),
                 const SizedBox(width: 6),
                 Text(
-                  '${dateFormat.format(widget.event.startDate)} to ${dateFormat.format(widget.event.endDate)}',
+                  '${dateFormat.format(widget.event.startDate)} to ${dateFormat.format(widget.event.endDate)}', // Dynamic dates
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: secondaryTextColor,
@@ -565,14 +557,15 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                 Icon(Icons.vpn_key, color: iconColor),
                 const SizedBox(width: 6),
                 Text(
-                  'Event Code: ${widget.event.eventCode}',
+                  'event_code_label'.tr(
+                    namedArgs: {'code': widget.event.eventCode},
+                  ), // Assuming 'event_code_label': 'Event Code: {code}'
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: secondaryTextColor,
                   ),
                 ),
               ],
             ),
-
             if (categories.isNotEmpty && !isRegistrationClosed)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
@@ -592,12 +585,13 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                           unselectedLabelColor: Colors.grey,
                           tabs:
                               categories
-                                  .map((cat) => Tab(text: cat.name))
+                                  .map(
+                                    (cat) => Tab(text: cat.name),
+                                  ) // Dynamic category names
                                   .toList(),
                         )
                         : const SizedBox.shrink(),
               ),
-
             if (categories.isNotEmpty && !isRegistrationClosed)
               if (_tabController != null)
                 SizedBox(
@@ -607,16 +601,16 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                     children:
                         categories.map((category) {
                           final teams = teamsByCategory[category.id] ?? [];
-
                           final approvedTeams =
-                              teams.where((team) {
-                                return team.pivot != null &&
-                                    team.pivot?.status == 'approved';
-                              }).toList();
-
+                              teams
+                                  .where(
+                                    (team) =>
+                                        team.pivot != null &&
+                                        team.pivot?.status == 'approved',
+                                  )
+                                  .toList();
                           final isFull =
                               approvedTeams.length >= category.capacity;
-
                           return Padding(
                             padding: const EdgeInsets.only(top: 10),
                             child: Column(
@@ -629,7 +623,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                                           category,
                                         ),
                                     icon: const Icon(Icons.add),
-                                    label: const Text("Assign Team"),
+                                    label: Text("assign_team_button".tr()),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.orange,
                                       foregroundColor: Colors.white,
@@ -648,19 +642,25 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                                       color: Colors.redAccent,
                                       borderRadius: BorderRadius.circular(12),
                                     ),
-                                    child: const Text(
-                                      'Full',
-                                      style: TextStyle(
+                                    child: Text(
+                                      'full_label'.tr(),
+                                      style: const TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
-
                                 const SizedBox(height: 20),
-
                                 Text(
-                                  'Teams Assigned to ${category.name} (${approvedTeams.length}/${category.capacity}):',
+                                  'teams_assigned_label'.tr(
+                                    namedArgs: {
+                                      'categoryName': category.name,
+                                      'assignedCount':
+                                          approvedTeams.length.toString(),
+                                      'capacity': category.capacity.toString(),
+                                    },
+                                  ),
+                                  // Assuming 'teams_assigned_label': 'Teams Assigned to {categoryName} ({assignedCount}/{capacity}):'
                                   style: Theme.of(
                                     context,
                                   ).textTheme.titleMedium?.copyWith(
@@ -672,12 +672,10 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                                             : Colors.black,
                                   ),
                                 ),
-
                                 const SizedBox(height: 10),
-
                                 if (approvedTeams.isEmpty)
                                   Text(
-                                    'No teams assigned yet.',
+                                    'no_teams_assigned_yet'.tr(),
                                     style:
                                         Theme.of(context).textTheme.bodyMedium,
                                   )
@@ -688,7 +686,9 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                                       itemBuilder: (context, index) {
                                         final team = approvedTeams[index];
                                         return ListTile(
-                                          title: Text(team.name),
+                                          title: Text(
+                                            team.name,
+                                          ), // Dynamic team name
                                           leading: const Icon(Icons.group),
                                           onTap: () {
                                             Navigator.push(
@@ -696,8 +696,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                                               MaterialPageRoute(
                                                 builder:
                                                     (_) => TeamPlayersPage(
-                                                      teamId:
-                                                          team.id, 
+                                                      teamId: team.id,
                                                       teamName: team.name,
                                                     ),
                                               ),
@@ -713,7 +712,6 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                         }).toList(),
                   ),
                 ),
-
             const SizedBox(height: 30),
             if ((userRole == 'coach' ||
                     userRole == 'admin' ||
@@ -724,14 +722,16 @@ class _EventDetailScreenState extends State<EventDetailScreen>
               else if (matchupError != null)
                 Center(
                   child: Text(
-                    'Error loading match-ups: $matchupError',
+                    'error_loading_matchups'.tr(
+                      namedArgs: {'error': matchupError!},
+                    ), // Assuming 'error_loading_matchups': 'Error loading match-ups: {error}'
                     style: const TextStyle(color: Colors.redAccent),
                   ),
                 )
               else if (eventWithMatchups.isEmpty)
                 Center(
                   child: Text(
-                    'Matches will be created soon.',
+                    'matches_will_be_created_soon'.tr(),
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: Colors.orangeAccent,
                       fontWeight: FontWeight.w600,

@@ -1,7 +1,7 @@
 import 'package:fiba_3x3/widgets/appBar.dart';
 import 'package:fiba_3x3/widgets/custom_drawer.dart';
-// import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 class Official3x3BallPage extends StatefulWidget {
@@ -37,7 +37,6 @@ class _Official3x3BallPageState extends State<Official3x3BallPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: ResponsiveAppBar(onToggleTheme: widget.onToggleTheme),
-
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -51,13 +50,13 @@ class _Official3x3BallPageState extends State<Official3x3BallPage> {
                   height: 500,
                   fit: BoxFit.cover,
                 ),
-                const Positioned(
+                Positioned(
                   top: 20,
                   left: 16,
                   right: 16,
                   child: Text(
-                    "OFFICIAL 3X3 BALL",
-                    style: TextStyle(
+                    "official_3x3_ball".tr(),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -69,6 +68,7 @@ class _Official3x3BallPageState extends State<Official3x3BallPage> {
                         ),
                       ],
                     ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ],
@@ -116,9 +116,12 @@ class _Official3x3BallPageState extends State<Official3x3BallPage> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.all(12.0),
-                          child: const Text(
-                            "UNIQUE GAME, UNIQUE BALL. Wilson paired their patented Wave Triple Threat Technology with a smaller ball spec to engineer a basketball with the kind of grip and control the energy of the 3x3 game demands",
-                            style: TextStyle(fontSize: 16, color: Colors.black),
+                          child: Text(
+                            "unique_game_unique_ball".tr(),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -131,16 +134,16 @@ class _Official3x3BallPageState extends State<Official3x3BallPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Column(
-                                children: const [
+                                children: [
                                   Text(
-                                    "SIZE",
-                                    style: TextStyle(
+                                    "size".tr(),
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black,
                                     ),
                                   ),
-                                  SizedBox(height: 8),
-                                  Text(
+                                  const SizedBox(height: 8),
+                                  const Text(
                                     "6",
                                     style: TextStyle(
                                       fontSize: 48,
@@ -150,16 +153,16 @@ class _Official3x3BallPageState extends State<Official3x3BallPage> {
                                 ],
                               ),
                               Column(
-                                children: const [
+                                children: [
                                   Text(
-                                    "WEIGHT",
-                                    style: TextStyle(
+                                    "weight".tr(),
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black,
                                     ),
                                   ),
-                                  SizedBox(height: 8),
-                                  Text(
+                                  const SizedBox(height: 8),
+                                  const Text(
                                     "7",
                                     style: TextStyle(
                                       fontSize: 48,
@@ -169,30 +172,30 @@ class _Official3x3BallPageState extends State<Official3x3BallPage> {
                                 ],
                               ),
                               Column(
-                                children: const [
+                                children: [
                                   Text(
-                                    "FEATURES",
-                                    style: TextStyle(
+                                    "features".tr(),
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black,
                                     ),
                                   ),
-                                  SizedBox(height: 8),
+                                  const SizedBox(height: 8),
                                   Text(
-                                    "Weather-proof",
-                                    style: TextStyle(color: Colors.black),
+                                    "weather_proof".tr(),
+                                    style: const TextStyle(color: Colors.black),
                                   ),
                                   Text(
-                                    "Fast-pace ready",
-                                    style: TextStyle(color: Colors.black),
+                                    "fast_pace_ready".tr(),
+                                    style: const TextStyle(color: Colors.black),
                                   ),
                                   Text(
-                                    "Optimised grip",
-                                    style: TextStyle(color: Colors.black),
+                                    "optimised_grip".tr(),
+                                    style: const TextStyle(color: Colors.black),
                                   ),
                                   Text(
-                                    "Urban design",
-                                    style: TextStyle(color: Colors.black),
+                                    "urban_design".tr(),
+                                    style: const TextStyle(color: Colors.black),
                                   ),
                                 ],
                               ),
@@ -202,7 +205,6 @@ class _Official3x3BallPageState extends State<Official3x3BallPage> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 16),
                   Container(
                     decoration: BoxDecoration(

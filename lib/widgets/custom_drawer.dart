@@ -3,6 +3,7 @@ import 'package:fiba_3x3/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fiba_3x3/services/team_service.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
@@ -37,7 +38,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
           children: [
             Container(
               height: 70,
-
               padding: const EdgeInsets.all(16),
               color: const Color.fromARGB(255, 34, 34, 34),
               child: Row(
@@ -62,64 +62,62 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 padding: EdgeInsets.zero,
                 children: [
                   _DrawerMenuItem(
-                    title: 'HOME',
+                    title: 'home'.tr(),
                     onTap: () {
                       Navigator.of(context).pushNamed('/home');
                     },
                   ),
                   _DrawerMenuItem(
-                    title: 'PROFILE',
+                    title: 'profile'.tr(),
                     onTap: () {
                       Navigator.of(context).pushNamed('/profile');
                     },
                   ),
                   _DrawerMenuItem(
-                    title: 'EVENTS',
+                    title: 'events'.tr(),
                     onTap: () {
                       Navigator.of(context).pushNamed('/search-event');
                     },
                   ),
                   _DrawerMenuItem(
-                    title: 'PLAYERS',
+                    title: 'players'.tr(),
                     onTap: () {
                       Navigator.of(context).pushNamed('/search-player');
                     },
                   ),
                   _DrawerMenuItem(
-                    title: 'LEADERBOARD',
+                    title: 'leaderboard'.tr(),
                     onTap: () {
                       Navigator.of(context).pushNamed('/leaderboard');
                     },
                   ),
                   _DrawerMenuItem(
-                    title: 'NEWS',
+                    title: 'news'.tr(),
                     onTap: () {
                       Navigator.of(context).pushNamed('/news');
                     },
                   ),
                   _DrawerMenuItem(
-                    title: 'BALL INFO',
+                    title: 'ball_info'.tr(),
                     onTap: () {
                       Navigator.of(context).pushNamed('/ball-info');
                     },
                   ),
                   _DrawerMenuItem(
-                    title: 'RULES',
+                    title: 'rules'.tr(),
                     onTap: () {
                       Navigator.of(context).pushNamed('/rules');
                     },
                   ),
-
                   _DrawerMenuItem(
-                    title: 'TEAMS',
+                    title: 'teams'.tr(),
                     onTap: () {
                       Navigator.of(context).pushNamed('/team');
                     },
                   ),
-
                   const Divider(color: Colors.white30),
                   _DrawerMenuItem(
-                    title: 'LOGOUT',
+                    title: 'logout'.tr(),
                     onTap: () async {
                       final authService = AuthService();
                       await authService.logout();
@@ -139,10 +137,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
               color: Colors.black,
               height: 70,
               width: double.infinity,
-              child: const Text(
-                'FIBA.BASKETBALL',
+              child: Text(
+                'fiba_basketball'.tr(),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.amber,
                   fontSize: 14,
                   fontWeight: FontWeight.bold,

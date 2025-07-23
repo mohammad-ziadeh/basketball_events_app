@@ -3,6 +3,7 @@ import 'package:fiba_3x3/services/event_service.dart';
 import 'package:fiba_3x3/services/players_profile_service.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class PlayedEventsPage extends StatefulWidget {
   final Player? player;
@@ -54,22 +55,22 @@ class _PlayedEventsPageState extends State<PlayedEventsPage> {
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: DataTable(
-          columns: const [
-            DataColumn(label: Text('EVENT')),
-            DataColumn(label: Text('DATE')),
-            DataColumn(label: Text('CATEGORY')),
-            DataColumn(label: Text('TEAM')),
-            DataColumn(label: Text('TEAM POINTS')),
+          columns: [
+            DataColumn(label: Text('event'.tr())),
+            DataColumn(label: Text('date'.tr())),
+            DataColumn(label: Text('category'.tr())),
+            DataColumn(label: Text('team'.tr())),
+            DataColumn(label: Text('team_points'.tr())),
           ],
           rows: List.generate(isLoading ? 4 : events.length, (index) {
             final event =
                 isLoading
                     ? PlayerEvent(
-                      eventName: 'Loading...',
+                      eventName: 'loading'.tr(),
                       points: 0,
-                      teamName: 'Loading...',
-                      startDate: 'Loading...',
-                      categoryName: 'Loading...',
+                      teamName: 'loading'.tr(),
+                      startDate: 'loading'.tr(),
+                      categoryName: 'loading'.tr(),
                       eventId: 0,
                     )
                     : events[index];
@@ -91,7 +92,9 @@ class _PlayedEventsPageState extends State<PlayedEventsPage> {
                     );
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to load event details')),
+                      SnackBar(
+                        content: Text('failed_to_load_event_details'.tr()),
+                      ),
                     );
                   }
                 }

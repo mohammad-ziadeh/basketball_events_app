@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:fiba_3x3/services/profile_service.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ProfilePage extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -109,7 +110,9 @@ class _ProfilePageState extends State<ProfilePage>
                 child: Column(
                   children: [
                     Text(
-                      isLoading ? "Loading..." : profile?.name ?? "Guest",
+                      isLoading
+                          ? "loading".tr()
+                          : profile?.name ?? "guest".tr(),
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -134,11 +137,11 @@ class _ProfilePageState extends State<ProfilePage>
                                 ? Colors.white
                                 : Colors.black,
                         unselectedLabelColor: Colors.grey,
-                        tabs: const [
-                          Tab(text: 'ABOUT'),
-                          Tab(text: 'ACTIVITY'),
-                          Tab(text: 'LEADERBOARD'),
-                          Tab(text: 'SOCIAL MEDIA'),
+                        tabs: [
+                          Tab(text: 'about'.tr()),
+                          Tab(text: 'activity'.tr()),
+                          Tab(text: 'leaderboard'.tr()),
+                          Tab(text: 'social_media'.tr()),
                         ],
                       ),
                     ),
@@ -159,9 +162,9 @@ class _ProfilePageState extends State<ProfilePage>
                                 );
                               }
                               if (!snapshot.hasData || snapshot.data == null) {
-                                return const Center(
+                                return Center(
                                   child: Text(
-                                    'Failed to get logged in user ID',
+                                    'failed_to_get_logged_in_user_id'.tr(),
                                   ),
                                 );
                               }
@@ -172,7 +175,11 @@ class _ProfilePageState extends State<ProfilePage>
                               );
                             },
                           ),
-                          Center(child: Text('${profile?.points ?? 0} Points')),
+                          Center(
+                            child: Text(
+                              '${profile?.points ?? 0} ${"points".tr()}',
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -204,7 +211,7 @@ class _BadgesRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (badges.isEmpty) {
-      return const Text('No badges earned yet.');
+      return Text('no_badges'.tr());
     }
 
     return Wrap(
@@ -218,8 +225,10 @@ class _BadgesRow extends StatelessWidget {
                 final requiredPoints = _pointsRequired[badge.title] ?? 0;
                 final msg =
                     badge.unlocked
-                        ? 'Badge "${badge.title}" unlocked!'
-                        : 'Need $requiredPoints points to unlock "${badge.title}".';
+                        ? 'badge_unlocked'.tr(args: [badge.title])
+                        : 'badge_locked'.tr(
+                          args: [requiredPoints.toString(), badge.title],
+                        );
                 ScaffoldMessenger.of(
                   context,
                 ).showSnackBar(SnackBar(content: Text(msg)));

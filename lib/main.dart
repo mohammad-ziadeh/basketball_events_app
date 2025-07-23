@@ -6,14 +6,53 @@ import 'package:fiba_3x3/pages/teams/team_list_page.dart';
 import 'package:fiba_3x3/splashScreen.dart';
 import 'package:fiba_3x3/widgets/smoothScroll.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'pages/landin_page/home.dart';
 import 'pages/profile/profile.dart';
 import 'pages/search.dart/search_event.dart';
 import 'pages/search.dart/search_player.dart';
 import 'pages/rules/rules.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
+
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [Locale('en'), Locale('ar')],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('en'),
+      child: const MyApp(),
+    ),
+  );
+}
+
+class LocalizedText extends StatelessWidget {
+  final String textKey;
+  final TextStyle? style;
+  final TextAlign? textAlign;
+  final int? maxLines;
+  final TextOverflow? overflow;
+
+  const LocalizedText(
+    this.textKey, {
+    this.style,
+    this.textAlign,
+    this.maxLines,
+    this.overflow,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      tr(textKey),
+      style: style,
+      textAlign: textAlign,
+      maxLines: maxLines,
+      overflow: overflow,
+    );
+  }
 }
 
 class MyApp extends StatefulWidget {
@@ -28,11 +67,8 @@ class _MyAppState extends State<MyApp> {
 
   void _toggleTheme() {
     setState(() {
-      if (_themeMode == ThemeMode.light) {
-        _themeMode = ThemeMode.dark;
-      } else {
-        _themeMode = ThemeMode.light;
-      }
+      _themeMode =
+          (_themeMode == ThemeMode.light) ? ThemeMode.dark : ThemeMode.light;
     });
   }
 
@@ -41,7 +77,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'FIBA 3X3',
       scrollBehavior: MyCustomScrollBehavior(),
-      // ----- {{ Light Theme }} ----- //
+
       theme: ThemeData.light().copyWith(
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.black,
@@ -56,7 +92,6 @@ class _MyAppState extends State<MyApp> {
         iconTheme: const IconThemeData(color: Colors.black),
         primaryIconTheme: const IconThemeData(color: Colors.black),
         scaffoldBackgroundColor: Colors.white,
-
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             foregroundColor: Colors.white,
@@ -66,13 +101,9 @@ class _MyAppState extends State<MyApp> {
             ),
           ),
         ),
-
         textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
-            foregroundColor: Colors.black, 
-          ),
+          style: TextButton.styleFrom(foregroundColor: Colors.black),
         ),
-
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
             foregroundColor: Colors.black,
@@ -84,9 +115,6 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
 
-      // ----- {{ End Light Theme }} ----- //
-
-      // ----- {{ Dark Theme }} ----- //
       darkTheme: ThemeData.dark().copyWith(
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.black,
@@ -101,23 +129,18 @@ class _MyAppState extends State<MyApp> {
         iconTheme: const IconThemeData(color: Colors.white),
         primaryIconTheme: const IconThemeData(color: Colors.white),
         cardColor: Colors.white,
-
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             foregroundColor: Colors.black,
-            backgroundColor: Colors.white, 
+            backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
           ),
         ),
-
         textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
-            foregroundColor: Colors.white, 
-          ),
+          style: TextButton.styleFrom(foregroundColor: Colors.white),
         ),
-
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
             foregroundColor: Colors.white,
@@ -129,7 +152,6 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
 
-      // ----- {{ End Dark Theme }} ----- //
       themeMode: _themeMode,
       debugShowCheckedModeBanner: false,
       home: SplashScreen(onToggleTheme: _toggleTheme),
@@ -140,13 +162,22 @@ class _MyAppState extends State<MyApp> {
         '/ball-info':
             (context) => Official3x3BallPage(onToggleTheme: _toggleTheme),
         '/rules': (context) => RulesPage(onToggleTheme: _toggleTheme),
-        '/leaderboard': (context) => LeaderboardScreen(onToggleTheme: _toggleTheme),
+        '/leaderboard':
+            (context) => LeaderboardScreen(onToggleTheme: _toggleTheme),
         '/news': (context) => BasketballNewsPage(onToggleTheme: _toggleTheme),
         '/team': (context) => TeamListPage(onToggleTheme: _toggleTheme),
         '/search-event': (context) => SearchEvent(onToggleTheme: _toggleTheme),
         '/notifications': (context) => NotificationsScreen(),
         '/search-player':
             (context) => SearchPlayer(onToggleTheme: _toggleTheme),
+      },
+
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
+
+      builder: (context, child) {
+        return Directionality(textDirection: TextDirection.ltr, child: child!);
       },
     );
   }

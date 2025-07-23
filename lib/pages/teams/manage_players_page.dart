@@ -3,6 +3,7 @@ import 'package:fiba_3x3/services/team_service.dart';
 import 'package:fiba_3x3/widgets/appBar.dart';
 import 'package:fiba_3x3/widgets/custom_drawer.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ManagePlayersPage extends StatefulWidget {
   final Map<String, dynamic> team;
@@ -105,13 +106,19 @@ class _ManagePlayersPageState extends State<ManagePlayersPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            '${toAdd.length} player(s) added, ${toRemove.length} removed.',
+            tr(
+              'players_updated',
+              args: [toAdd.length.toString(), toRemove.length.toString()],
+            ),
           ),
         ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text('${tr('error')}: $e'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -127,15 +134,15 @@ class _ManagePlayersPageState extends State<ManagePlayersPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Manage Players for ${widget.team['name']}',
+              tr('manage_players_for', args: [widget.team['name']]),
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
             TextField(
-              decoration: const InputDecoration(
-                labelText: 'Search Player',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: tr('search_player'),
+                prefixIcon: const Icon(Icons.search),
+                border: const OutlineInputBorder(),
               ),
               onChanged: _filterPlayers,
             ),
@@ -148,10 +155,12 @@ class _ManagePlayersPageState extends State<ManagePlayersPage> {
                   child:
                       _error != null
                           ? Center(
-                            child: Text('Error loading players: $_error'),
+                            child: Text(
+                              tr('error_loading_players', args: [_error!]),
+                            ),
                           )
                           : filteredPlayers.isEmpty
-                          ? const Center(child: Text('No players found'))
+                          ? Center(child: Text(tr('no_players_found')))
                           : ListView.builder(
                             itemCount: filteredPlayers.length,
                             itemBuilder: (context, index) {
@@ -188,12 +197,12 @@ class _ManagePlayersPageState extends State<ManagePlayersPage> {
               children: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Cancel'),
+                  child: Text(tr('cancel')),
                 ),
                 ElevatedButton(
                   onPressed:
                       selectedPlayerIds.isEmpty ? null : _updateTeamPlayers,
-                  child: const Text('Update Team'),
+                  child: Text(tr('update_team')),
                 ),
               ],
             ),

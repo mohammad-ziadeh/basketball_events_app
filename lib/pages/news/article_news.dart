@@ -1,4 +1,5 @@
 import 'package:fiba_3x3/widgets/appBar.dart';
+import 'package:fiba_3x3/widgets/custom_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fiba_3x3/services/news_api_service.dart';
@@ -67,7 +68,6 @@ class _BasketballNewsPageState extends State<BasketballNewsPage> {
   }
 
   void _openArticle(String url) async {
-
     if (url.isEmpty) {
       ScaffoldMessenger.of(
         context,
@@ -209,6 +209,7 @@ class _BasketballNewsPageState extends State<BasketballNewsPage> {
                   },
                 ),
       ),
+      endDrawer: const CustomDrawer(),
     );
   }
 }

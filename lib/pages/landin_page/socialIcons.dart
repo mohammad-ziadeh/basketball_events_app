@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SocialFollowSection extends StatefulWidget {
   const SocialFollowSection({super.key});
@@ -47,11 +48,11 @@ class _SocialFollowSectionState extends State<SocialFollowSection> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Padding(
-          padding: EdgeInsets.all(16.0),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
           child: Text(
-            'FOLLOW FIBA 3X3',
-            style: TextStyle(
+            'follow_fiba'.tr(),
+            style: const TextStyle(
               fontSize: 25,
               fontWeight: FontWeight.w900,
               letterSpacing: -1,
@@ -63,8 +64,8 @@ class _SocialFollowSectionState extends State<SocialFollowSection> {
           backgroundColor: const Color(0xFFe30613),
           icon: FontAwesomeIcons.youtube,
           title: stats?['youtube']?.toString(),
-          subtitle: 'YOUTUBE SUBSCRIBERS',
-          buttonText: 'Subscribe now',
+          subtitle: 'youtube_subs'.tr(),
+          buttonText: 'subscribe_now'.tr(),
           isLoadingNumber: isLoading,
           url: 'https://www.youtube.com/@FIBA',
         ),
@@ -73,8 +74,8 @@ class _SocialFollowSectionState extends State<SocialFollowSection> {
           backgroundColor: const Color(0xFF3b5998),
           icon: FontAwesomeIcons.facebook,
           title: stats?['facebook']?.toString(),
-          subtitle: 'FACEBOOK FOLLOWERS',
-          buttonText: 'Follow us',
+          subtitle: 'facebook_followers'.tr(),
+          buttonText: 'follow_us'.tr(),
           isLoadingNumber: isLoading,
           url: 'https://www.facebook.com/FIBA',
         ),
@@ -83,8 +84,8 @@ class _SocialFollowSectionState extends State<SocialFollowSection> {
           backgroundColor: const Color(0xFFe1306C),
           icon: FontAwesomeIcons.instagram,
           title: stats?['instagram']?.toString(),
-          subtitle: 'INSTAGRAM FOLLOWERS',
-          buttonText: 'Follow us',
+          subtitle: 'instagram_followers'.tr(),
+          buttonText: 'follow_us'.tr(),
           isLoadingNumber: isLoading,
           url: 'https://www.instagram.com/FIBA/',
         ),
@@ -93,8 +94,8 @@ class _SocialFollowSectionState extends State<SocialFollowSection> {
           backgroundColor: const Color.fromARGB(255, 26, 26, 26),
           icon: FontAwesomeIcons.tiktok,
           title: '55000',
-          subtitle: 'TIKTOK FOLLOWERS',
-          buttonText: 'Follow us',
+          subtitle: 'tiktok_followers'.tr(),
+          buttonText: 'follow_us'.tr(),
           isLoadingNumber: false,
           url: 'https://www.tiktok.com/@yourprofile',
         ),
@@ -139,7 +140,7 @@ class _SocialFollowSectionState extends State<SocialFollowSection> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     isLoadingNumber
-                        ? SizedBox(
+                        ? const SizedBox(
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
@@ -181,7 +182,7 @@ class _SocialFollowSectionState extends State<SocialFollowSection> {
                   await launchUrl(uri, mode: LaunchMode.externalApplication);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Could not launch URL')),
+                    SnackBar(content: Text('could_not_launch'.tr())),
                   );
                 }
               },

@@ -3,6 +3,7 @@ import 'package:fiba_3x3/pages/search.dart/player_profile/player_profile_page.da
 import 'package:fiba_3x3/services/players_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SearchPlayer extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -126,7 +127,7 @@ class _SearchPlayerState extends State<SearchPlayer>
               child: Column(
                 children: [
                   Text(
-                    'SEARCH FOR 3X3 PLAYERS WORLDWIDE',
+                    'search_players_title'.tr(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -140,7 +141,7 @@ class _SearchPlayerState extends State<SearchPlayer>
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Start typing and select the search type (e.g. by first name or last name ) from the suggestions',
+                    'search_players_description'.tr(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,

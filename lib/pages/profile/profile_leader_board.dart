@@ -1,6 +1,7 @@
 import 'package:fiba_3x3/services/leader_board_service.dart';
 import 'package:fiba_3x3/services/profile_service.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class LeaderBoardPage extends StatefulWidget {
   final int loggedInPlayerId;
@@ -98,7 +99,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage>
           labelColor: textColor,
           unselectedLabelColor: Colors.grey,
           indicatorColor: textColor,
-          tabs: const [Tab(text: 'Players'), Tab(text: 'Teams')],
+          tabs: [Tab(text: 'players'.tr()), Tab(text: 'teams'.tr())],
         ),
         Expanded(
           child: TabBarView(
@@ -108,7 +109,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage>
               isLoadingPlayers
                   ? const Center(child: CircularProgressIndicator())
                   : playerError != null
-                  ? Center(child: Text('Error: $playerError'))
+                  ? Center(child: Text('error'.tr(args: [playerError!])))
                   : RefreshIndicator(
                     onRefresh: _loadPlayerLeaderboard,
                     child: ListView.separated(
@@ -157,7 +158,6 @@ class _LeaderBoardPageState extends State<LeaderBoardPage>
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-
                               const SizedBox(width: 16),
                               Text(
                                 '${player.points} pts',
@@ -178,7 +178,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage>
               isLoadingTeams
                   ? const Center(child: CircularProgressIndicator())
                   : teamError != null
-                  ? Center(child: Text('Error: $teamError'))
+                  ? Center(child: Text('Error: $playerError'))
                   : RefreshIndicator(
                     onRefresh: _loadTeamLeaderboard,
                     child: ListView.separated(

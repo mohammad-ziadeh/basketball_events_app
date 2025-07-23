@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SocialMediaBar extends StatelessWidget {
   const SocialMediaBar({super.key});
@@ -19,12 +20,12 @@ class SocialMediaBar extends StatelessWidget {
               SvgPicture.asset('assets/images/3x3Logo.svg', height: 30),
             ],
           ),
-
           const SizedBox(height: 16),
+
           ExpansionTile(
             title: Text(
-              'Events',
-              style: TextStyle(color: Colors.white, fontSize: 16),
+              'events'.tr(),
+              style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
             iconColor: Colors.white,
             textColor: Colors.white,
@@ -32,8 +33,8 @@ class SocialMediaBar extends StatelessWidget {
           ),
           ExpansionTile(
             title: Text(
-              '3x3',
-              style: TextStyle(color: Colors.white, fontSize: 16),
+              'three_x_three'.tr(),
+              style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
             iconColor: Colors.white,
             textColor: Colors.white,
@@ -41,27 +42,28 @@ class SocialMediaBar extends StatelessWidget {
           ),
 
           const SizedBox(height: 16),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               _buildSocialIcon(
                 FontAwesomeIcons.youtube,
-                'YouTube',
+                'youtube'.tr(),
                 'https://www.youtube.com/@FIBA',
               ),
               _buildSocialIcon(
                 FontAwesomeIcons.facebook,
-                'Facebook',
+                'facebook'.tr(),
                 'https://www.facebook.com/FIBA',
               ),
               _buildSocialIcon(
                 FontAwesomeIcons.instagram,
-                'Instagram',
+                'instagram'.tr(),
                 'https://www.instagram.com/FIBA/',
               ),
               _buildSocialIcon(
                 FontAwesomeIcons.tiktok,
-                'TikTok',
+                'tiktok'.tr(),
                 'https://tiktok.com',
               ),
             ],
@@ -77,17 +79,17 @@ class SocialMediaBar extends StatelessWidget {
   }) {
     final Map<String, List<Map<String, String>>> menu = {
       'Events': [
-        {'label': 'Home', 'route': '/home'},
-        {'label': 'Profile', 'route': '/profile'},
-        {'label': 'Events', 'route': '/search-event'},
+        {'label': 'home', 'route': '/home'},
+        {'label': 'profile', 'route': '/profile'},
+        {'label': 'events', 'route': '/search-event'},
       ],
       '3x3': [
-        {'label': 'LeaderBoard', 'route': '/leaderboard'},
-        {'label': 'Players', 'route': '/search-player'},
-        {'label': 'News', 'route': '/news'},
-        {'label': 'Ball Info', 'route': '/ball-info'},
-        {'label': 'Rules', 'route': '/rules'},
-        {'label': 'Teams', 'route': '/team'},
+        {'label': 'leaderboard', 'route': '/leaderboard'},
+        {'label': 'players', 'route': '/search-player'},
+        {'label': 'news', 'route': '/news'},
+        {'label': 'ball_info', 'route': '/ball-info'},
+        {'label': 'rules', 'route': '/rules'},
+        {'label': 'teams', 'route': '/team'},
       ],
     };
 
@@ -96,7 +98,7 @@ class SocialMediaBar extends StatelessWidget {
     return items.map((item) {
       return ListTile(
         title: Text(
-          item['label']!,
+          item['label']!.tr(),
           style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
         ),
         onTap: () {
@@ -122,7 +124,10 @@ class SocialMediaBar extends StatelessWidget {
           children: [
             FaIcon(icon, size: 24, color: Colors.white),
             const SizedBox(height: 4),
-            Text(label, style: TextStyle(fontSize: 12, color: Colors.white)),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 12, color: Colors.white),
+            ),
           ],
         ),
       ),

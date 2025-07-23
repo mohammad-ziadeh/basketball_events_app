@@ -1,6 +1,7 @@
 import 'package:fiba_3x3/services/NotificationService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ResponsiveAppBar extends StatefulWidget implements PreferredSizeWidget {
   final VoidCallback onToggleTheme;
@@ -110,6 +111,23 @@ class _ResponsiveAppBarState extends State<ResponsiveAppBar> {
                     icon: const Icon(Icons.brightness_6),
                     onPressed: widget.onToggleTheme,
                   ),
+                  IconButton(
+                    tooltip: 'Change Language',
+                    icon: Text(
+                      context.locale.languageCode.toUpperCase(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    onPressed: () {
+                      final newLocale =
+                          context.locale.languageCode == 'en'
+                              ? const Locale('ar')
+                              : const Locale('en');
+                      context.setLocale(newLocale);
+                    },
+                  ),
                 ],
               ),
             ),
@@ -119,6 +137,23 @@ class _ResponsiveAppBarState extends State<ResponsiveAppBar> {
             builder:
                 (context) => Row(
                   children: [
+                    IconButton(
+                      tooltip: 'Change Language',
+                      icon: Text(
+                        context.locale.languageCode.toUpperCase(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onPressed: () {
+                        final newLocale =
+                            context.locale.languageCode == 'en'
+                                ? const Locale('ar')
+                                : const Locale('en');
+                        context.setLocale(newLocale);
+                      },
+                    ),
                     IconButton(
                       icon: const Icon(Icons.brightness_6),
                       onPressed: widget.onToggleTheme,

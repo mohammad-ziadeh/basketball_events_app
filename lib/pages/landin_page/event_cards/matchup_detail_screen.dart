@@ -2,10 +2,10 @@ import 'package:fiba_3x3/pages/search.dart/player_profile/player_profile_page.da
 import 'package:fiba_3x3/services/matchup_events_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class MatchupDetailScreen extends StatefulWidget {
   final int matchupId;
-
   const MatchupDetailScreen({super.key, required this.matchupId});
 
   @override
@@ -28,10 +28,9 @@ class _MatchupDetailScreenState extends State<MatchupDetailScreen> {
     final bgColor = theme.scaffoldBackgroundColor;
     final textColor = isDark ? Colors.white : Colors.black87;
     final cardColor = isDark ? Colors.grey[900] : Colors.white;
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Match Summary'),
+        title: Text('match_summary_title'.tr()),
         backgroundColor: isDark ? Colors.black : Colors.black,
         foregroundColor: Colors.white,
         elevation: 1,
@@ -50,9 +49,7 @@ class _MatchupDetailScreenState extends State<MatchupDetailScreen> {
               ),
             );
           }
-
           final summary = snapshot.data!;
-
           return SingleChildScrollView(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -61,8 +58,8 @@ class _MatchupDetailScreenState extends State<MatchupDetailScreen> {
                 const SizedBox(height: 20),
                 _buildStatCard(
                   icon: Icons.emoji_events,
-                  label: 'Winner',
-                  value: summary.winnerTeam ?? 'Not decided yet',
+                  label: 'winner_label'.tr(),
+                  value: summary.winnerTeam ?? 'not_decided_yet'.tr(),
                   cardColor: cardColor,
                   textColor: textColor,
                 ),
@@ -70,7 +67,7 @@ class _MatchupDetailScreenState extends State<MatchupDetailScreen> {
                 if (summary.highestScorePlayer != null)
                   _buildPlayerHighlight(
                     icon: Icons.sports_basketball,
-                    label: 'Top Scorer',
+                    label: 'top_scorer_label'.tr(),
                     player: summary.highestScorePlayer!,
                     textColor: textColor,
                     cardColor: cardColor,
@@ -78,7 +75,7 @@ class _MatchupDetailScreenState extends State<MatchupDetailScreen> {
                 if (summary.topAssistPlayer != null)
                   _buildPlayerHighlight(
                     icon: Icons.assistant,
-                    label: 'Top Assists',
+                    label: 'top_assists_label'.tr(),
                     player: summary.topAssistPlayer!,
                     textColor: textColor,
                     cardColor: cardColor,
@@ -86,7 +83,7 @@ class _MatchupDetailScreenState extends State<MatchupDetailScreen> {
                 if (summary.mostFoulTeam != null)
                   _buildStatCard(
                     icon: Icons.warning,
-                    label: 'Most Fouls',
+                    label: 'most_fouls_label'.tr(),
                     value:
                         '${summary.mostFoulTeam!.teamName} (${summary.mostFoulTeam!.fouls})',
                     cardColor: cardColor,
@@ -140,7 +137,7 @@ class _MatchupDetailScreenState extends State<MatchupDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Time: ${summary.matchTime.isNotEmpty ? DateFormat('MMM d, h:mm a').format(DateTime.parse(summary.matchTime)) : 'TBD'}',
+                    '${'time_label'.tr()}: ${summary.matchTime.isNotEmpty ? DateFormat('MMM d, h:mm a').format(DateTime.parse(summary.matchTime)) : 'tbd'.tr()}',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: textColor,
                     ),
@@ -148,21 +145,21 @@ class _MatchupDetailScreenState extends State<MatchupDetailScreen> {
                   const SizedBox(height: 6),
                   if (summary.category != null)
                     Text(
-                      'Category: ${summary.category!.name}',
+                      '${'category_label'.tr()}: ${summary.category!.name}',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: textColor,
                       ),
                     ),
                   if (summary.round != null)
                     Text(
-                      'Round: ${summary.round!}',
+                      '${'round_label'.tr()}: ${summary.round!}',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: textColor,
                       ),
                     ),
                   if (summary.location != null)
                     Text(
-                      'Location: ${summary.location!}',
+                      '${'location_label'.tr()}: ${summary.location!}',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: textColor,
                       ),
@@ -217,7 +214,7 @@ class _MatchupDetailScreenState extends State<MatchupDetailScreen> {
         leading: Icon(icon, color: textColor),
         title: Text(label, style: TextStyle(color: textColor)),
         subtitle: Text(
-          '${player.playerName} — ${player.points} pts, ${player.assists} ast, ${player.fouls} fouls',
+          '${player.playerName} — ${'pts_label'.tr()} ${player.points}, ${'ast_label'.tr()} ${player.assists}, ${'fouls_label'.tr()} ${player.fouls}',
           style: TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 15,
@@ -238,7 +235,7 @@ class _MatchupDetailScreenState extends State<MatchupDetailScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'All Player Stats',
+          'all_player_stats_title'.tr(),
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
             color: textColor,
@@ -255,10 +252,7 @@ class _MatchupDetailScreenState extends State<MatchupDetailScreen> {
             child: InkWell(
               borderRadius: BorderRadius.circular(8),
               onTap: () {
-                final idToUse =
-                    player.userId ??
-                    player.playerId; 
-
+                final idToUse = player.userId ?? player.playerId;
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -270,7 +264,6 @@ class _MatchupDetailScreenState extends State<MatchupDetailScreen> {
                   ),
                 );
               },
-
               child: ListTile(
                 leading: CircleAvatar(
                   backgroundImage:
@@ -288,7 +281,7 @@ class _MatchupDetailScreenState extends State<MatchupDetailScreen> {
                   ),
                 ),
                 subtitle: Text(
-                  'Pts: ${player.points}   Ast: ${player.assists}   Fouls: ${player.fouls}',
+                  '${'pts_label'.tr()}: ${player.points}   ${'ast_label'.tr()}: ${player.assists}   ${'fouls_label'.tr()}: ${player.fouls}',
                   style: TextStyle(color: textColor.withOpacity(0.85)),
                 ),
               ),

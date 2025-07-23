@@ -4,6 +4,7 @@ import 'package:fiba_3x3/services/event_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SearchEvent extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -131,7 +132,7 @@ class _SearchEventState extends State<SearchEvent>
               child: Column(
                 children: [
                   Text(
-                    'SEARCH FOR 3X3 EVENTS WORLDWIDE',
+                    'search_events_title'.tr(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -145,7 +146,7 @@ class _SearchEventState extends State<SearchEvent>
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Start typing and select the search type (e.g. by title, by location or by season) from the suggestions',
+                    'search_events_description'.tr(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,

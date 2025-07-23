@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class RulesTable extends StatelessWidget {
   const RulesTable({super.key});
@@ -24,21 +25,56 @@ Widget _buildComparisonTable() {
     children: [
       TableRow(
         children: [
-          _buildTableCell('RULE', bold: true),
-          _buildTableCell('3X3', bold: true),
-          _buildTableCell('BASKETBALL', bold: true),
+          _buildTableCell('rules_table.rule'.tr(), bold: true),
+          _buildTableCell('rules_table.3x3'.tr(), bold: true),
+          _buildTableCell('rules_table.basketball'.tr(), bold: true),
         ],
       ),
-
-      _buildDataRow('HOOP', '1', '2'),
-      _buildDataRow('COURT', 'HALF', 'FULL'),
-      _buildDataRow('PLAYERS', '3-A-SIDE', '5-A-SIDE'),
-      _buildDataRow('BALL', '3X3', 'BASKETBALL'),
-      _buildDataRow('PLAYING TIME', '10\'', '4 X 10\''),
-      _buildDataRow('GAME OVER', '21 PTS', 'N/A'),
-      _buildDataRow('SHOT-CLOCK', '12"', '24"'),
-      _buildDataRow('FIELD GOALS', '1 OR 2 PTS', '2 OR 3 PTS'),
-      _buildDataRow('AFTER SCORING', 'NO BREAK', 'INBOUND'),
+      _buildDataRow(
+        'rules_table.hoop'.tr(),
+        'rules_table.hoop_3x3'.tr(),
+        'rules_table.hoop_basketball'.tr(),
+      ),
+      _buildDataRow(
+        'rules_table.court'.tr(),
+        'rules_table.court_3x3'.tr(),
+        'rules_table.court_basketball'.tr(),
+      ),
+      _buildDataRow(
+        'rules_table.players'.tr(),
+        'rules_table.players_3x3'.tr(),
+        'rules_table.players_basketball'.tr(),
+      ),
+      _buildDataRow(
+        'rules_table.ball'.tr(),
+        'rules_table.ball_3x3'.tr(),
+        'rules_table.ball_basketball'.tr(),
+      ),
+      _buildDataRow(
+        'rules_table.playing_time'.tr(),
+        'rules_table.playing_time_3x3'.tr(),
+        'rules_table.playing_time_basketball'.tr(),
+      ),
+      _buildDataRow(
+        'rules_table.game_over'.tr(),
+        'rules_table.game_over_3x3'.tr(),
+        'rules_table.game_over_basketball'.tr(),
+      ),
+      _buildDataRow(
+        'rules_table.shot_clock'.tr(),
+        'rules_table.shot_clock_3x3'.tr(),
+        'rules_table.shot_clock_basketball'.tr(),
+      ),
+      _buildDataRow(
+        'rules_table.field_goals'.tr(),
+        'rules_table.field_goals_3x3'.tr(),
+        'rules_table.field_goals_basketball'.tr(),
+      ),
+      _buildDataRow(
+        'rules_table.after_scoring'.tr(),
+        'rules_table.after_scoring_3x3'.tr(),
+        'rules_table.after_scoring_basketball'.tr(),
+      ),
     ],
   );
 }

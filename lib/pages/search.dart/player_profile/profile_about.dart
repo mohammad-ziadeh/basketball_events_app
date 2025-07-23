@@ -1,6 +1,7 @@
 import 'package:fiba_3x3/services/players_profile_service.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class PlayerAboutPage extends StatefulWidget {
   final Player? player;
@@ -43,21 +44,30 @@ class _PlayerAboutPageState extends State<PlayerAboutPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
-            buildDetailRow(label: 'Full Name', value: player?.name ?? 'N/A'),
+            buildDetailRow(
+              label: 'full_name'.tr(),
+              value: player?.name ?? 'N/A',
+            ),
             const Divider(),
             if (player?.email != null)
-              buildDetailRow(label: 'Email', value: player!.email!),
+              buildDetailRow(label: 'email'.tr(), value: player!.email!),
             if (player?.email != null) const Divider(),
-            buildDetailRow(label: 'Gender', value: player?.gender ?? 'N/A'),
+            buildDetailRow(
+              label: 'gender'.tr(),
+              value: player?.gender ?? 'N/A',
+            ),
             const Divider(),
             buildDetailRow(
-              label: 'Birth Date',
+              label: 'birth_date'.tr(),
               value: player?.birthDate ?? 'N/A',
             ),
             const Divider(),
-            buildDetailRow(label: 'Rank', value: player?.rank ?? 'N/A'),
+            buildDetailRow(label: 'rank'.tr(), value: player?.rank ?? 'N/A'),
             const Divider(),
-            buildDetailRow(label: 'Points', value: '${player?.points ?? 0}'),
+            buildDetailRow(
+              label: 'points'.tr(),
+              value: '${player?.points ?? 0}',
+            ),
           ],
         ),
       ),

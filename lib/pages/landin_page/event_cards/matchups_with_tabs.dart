@@ -32,7 +32,6 @@ class _MatchupsWithTabsState extends State<MatchupsWithTabs>
   void initState() {
     super.initState();
 
-    // Extract categories
     categories =
         widget.eventWithMatchups
             .map((m) => m.category?.name ?? 'Unknown Category')
@@ -44,7 +43,6 @@ class _MatchupsWithTabsState extends State<MatchupsWithTabs>
     roundsByGroup = {};
 
     for (var category in categories) {
-      // Groups within this category
       final groups =
           widget.eventWithMatchups
               .where(
@@ -58,7 +56,6 @@ class _MatchupsWithTabsState extends State<MatchupsWithTabs>
       groupsByCategory[category] = groups;
 
       for (var group in groups) {
-        // Rounds within this group and category
         final rounds =
             widget.eventWithMatchups
                 .where(
@@ -129,7 +126,6 @@ class _MatchupsWithTabsState extends State<MatchupsWithTabs>
         ),
         const SizedBox(height: 12),
 
-        // Top-level Category TabBar
         TabBar(
           controller: _categoryController,
           isScrollable: true,
@@ -141,7 +137,6 @@ class _MatchupsWithTabsState extends State<MatchupsWithTabs>
 
         const SizedBox(height: 16),
 
-        // TabBarView for each category
         SizedBox(
           height: 500,
           child: TabBarView(

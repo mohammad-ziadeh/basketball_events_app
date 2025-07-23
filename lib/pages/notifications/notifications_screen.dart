@@ -1,6 +1,7 @@
 import 'package:fiba_3x3/services/NotificationService.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // For better timestamp formatting
+import 'package:easy_localization/easy_localization.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -41,15 +42,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       backgroundColor: bgColor,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: const Text(
-          "Notifications",
-          style: TextStyle(color: Colors.white),
+        title: Text(
+          "notifications".tr(),
+          style: const TextStyle(color: Colors.white),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(
             icon: const Icon(Icons.done_all),
-            tooltip: "Mark all as read",
+            tooltip: "mark_all_as_read".tr(),
             onPressed: () async {
               await notificationService.markAllAsRead();
               _refreshNotifications();
@@ -57,7 +58,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.delete_sweep),
-            tooltip: "Delete all",
+            tooltip: "delete_all".tr(),
             onPressed: () async {
               await notificationService.deleteAllNotifications();
               _refreshNotifications();
@@ -73,7 +74,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             if (notifications.isEmpty) {
               return Center(
                 child: Text(
-                  "No notifications yet.",
+                  "no_notifications_yet".tr(),
                   style: TextStyle(
                     color: isDark ? Colors.white70 : Colors.black54,
                   ),
@@ -147,12 +148,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         if (notif.type ==
                             'App\\Notifications\\CreatingEventNotification') ...[
                           Text(
-                            "Event: ${notif.eventTitle}",
+                            "${"event".tr()}: ${notif.eventTitle}",
                             style: TextStyle(color: Colors.teal),
                           ),
                           if (notif.startDate != null && notif.endDate != null)
                             Text(
-                              "Start: ${DateFormat.yMMMd().format(notif.startDate!)} - End: ${DateFormat.yMMMd().format(notif.endDate!)}",
+                              "${"start".tr()}: ${DateFormat.yMMMd().format(notif.startDate!)} - ${"end".tr()}: ${DateFormat.yMMMd().format(notif.endDate!)}",
                               style: TextStyle(
                                 color: isDark ? Colors.white70 : Colors.black54,
                               ),
@@ -160,7 +161,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         ] else if (notif.type ==
                             'App\\Notifications\\TeamAcceptedNotification') ...[
                           Text(
-                            "Your team was ${notif.message.contains('approved') ? 'approved' : 'denied'}",
+                            notif.message.contains('approved')
+                                ? "your_team_approved".tr()
+                                : "your_team_denied".tr(),
                             style: const TextStyle(color: Colors.orangeAccent),
                           ),
                         ] else if (notif.type ==
@@ -173,7 +176,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           ),
                           if (notif.eventTitle.isNotEmpty)
                             Text(
-                              "Event: ${notif.eventTitle}",
+                              "${"event".tr()}: ${notif.eventTitle}",
                               style: TextStyle(color: Colors.white70),
                             ),
                         ],
@@ -182,7 +185,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           Padding(
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
-                              "Read at: ${formatDateTime(notif.readAt!)}",
+                              "${"read_at".tr()}: ${formatDateTime(notif.readAt!)}",
                               style: const TextStyle(
                                 fontSize: 12,
                                 color: Color.fromARGB(255, 180, 180, 180),
@@ -207,7 +210,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                   Icons.check_circle,
                                   color: Colors.green,
                                 ),
-                                label: const Text("Mark Read"),
+                                label: Text("mark_read".tr()),
                                 style: TextButton.styleFrom(
                                   foregroundColor: Colors.green,
                                 ),
@@ -223,7 +226,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                 Icons.delete_outline,
                                 color: Colors.redAccent,
                               ),
-                              label: const Text("Delete"),
+                              label: Text("delete".tr()),
                               style: TextButton.styleFrom(
                                 foregroundColor: Colors.redAccent,
                               ),

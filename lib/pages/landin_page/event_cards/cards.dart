@@ -4,6 +4,7 @@ import 'package:fiba_3x3/services/event_service.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:intl/intl.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class EventCard extends StatefulWidget {
   const EventCard({super.key});
@@ -105,7 +106,6 @@ class EventCardState extends State<EventCard> {
                             ),
                           ),
                     ),
-
                     Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: Column(
@@ -194,7 +194,7 @@ class EventCardState extends State<EventCard> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data!.isEmpty) {
-            return const Center(child: Text("No events available."));
+            return Center(child: Text('no_events'.tr()));
           }
 
           final cards =
@@ -238,7 +238,7 @@ class EventCardState extends State<EventCard> {
             );
           }
         } else if (snapshot.hasError) {
-          return Text("Error: ${snapshot.error}");
+          return Text('${'error_loading'.tr()}: ${snapshot.error}');
         }
 
         // Skeleton loader

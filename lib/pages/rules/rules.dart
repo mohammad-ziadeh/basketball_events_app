@@ -5,6 +5,7 @@ import 'package:fiba_3x3/widgets/appBar.dart';
 import 'package:fiba_3x3/widgets/custom_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class RulesPage extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -67,12 +68,12 @@ class _RulesPageState extends State<RulesPage>
                   height: 500,
                   fit: BoxFit.cover,
                 ),
-                const Positioned(
+                Positioned(
                   top: 40,
                   left: 20,
                   child: Text(
-                    "RULES",
-                    style: TextStyle(
+                    '_rules.title'.tr(),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -92,25 +93,23 @@ class _RulesPageState extends State<RulesPage>
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
-                children: const [
+                children: [
                   RuleCard(
                     icon: Icons.sports_basketball_outlined,
-                    title: 'Simple',
-                    description: '1 hoop,\n1 half court\n2 teams of 3 + 1 sub',
+                    title: '_rules.simple.title'.tr(),
+                    description: '_rules.simple.description'.tr(),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   RuleCard(
                     icon: Icons.flash_on,
-                    title: 'Fast',
-                    description:
-                        '10-minute game\n12-second shot-clock\nNo break after scoring\nNo half-time\nNo quarters',
+                    title: '_rules.fast.title'.tr(),
+                    description: '_rules.fast.description'.tr(),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   RuleCard(
                     icon: Icons.music_note_outlined,
-                    title: 'Entertaining',
-                    description:
-                        'Game over at 21 pts\nFirst to 2 pts wins OT\nNon-stop music',
+                    title: '_rules.entertaining.title'.tr(),
+                    description: '_rules.entertaining.description'.tr(),
                   ),
                 ],
               ),
@@ -130,7 +129,7 @@ class _RulesPageState extends State<RulesPage>
             ),
             const SizedBox(height: 60),
             Text(
-              'MAIN DIFFERENCES 3x3 vs Basketball',
+              '_rules.main_diff'.tr(),
               style: TextStyle(
                 fontSize: 24,
                 textBaseline: TextBaseline.alphabetic,
@@ -142,7 +141,7 @@ class _RulesPageState extends State<RulesPage>
               ),
             ),
             const SizedBox(height: 30),
-            RulesTable(),
+            const RulesTable(),
             const SizedBox(height: 30),
             Column(
               children: [
@@ -160,7 +159,10 @@ class _RulesPageState extends State<RulesPage>
                             ? Colors.white
                             : Colors.black,
                     unselectedLabelColor: Colors.grey,
-                    tabs: const [Tab(text: 'RULES'), Tab(text: 'SCORE SHEETS')],
+                    tabs: [
+                      Tab(text: '_rules.tab_rules'.tr()),
+                      Tab(text: '_rules.tab_score_sheets'.tr()),
+                    ],
                   ),
                 ),
                 SizedBox(

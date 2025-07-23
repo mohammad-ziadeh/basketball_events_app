@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fiba_3x3/services/leader_board_service.dart';
 import 'package:fiba_3x3/services/profile_service.dart';
 import 'package:fiba_3x3/widgets/appBar.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class LeaderboardScreen extends StatefulWidget {
   final Profile? profile;
@@ -131,7 +132,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
             ),
           ),
           trailing: Text(
-            '${player.points} pts',
+            '${player.points} ${'pts'.tr()}',
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
@@ -153,24 +154,24 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
             context,
             MaterialPageRoute(
               builder:
-                  (_) => TeamPlayersPage(
-                    teamId: team.id, // assuming teamId field exists
-                    teamName: team.name,
-                  ),
+                  (_) => TeamPlayersPage(teamId: team.id, teamName: team.name),
             ),
           );
         },
         child: ListTile(
           leading: CircleAvatar(
             backgroundColor: isDark ? Colors.grey.shade400 : Colors.black,
-            child: Text('${index + 1}', style: TextStyle(color: Colors.white)),
+            child: Text(
+              '${index + 1}',
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
           title: Text(
             team.name,
             style: const TextStyle(fontWeight: FontWeight.w600),
           ),
           trailing: Text(
-            '${team.points} pts',
+            '${team.points} ${'pts'.tr()}',
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
@@ -193,7 +194,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
               labelColor: isDark ? Colors.white : Colors.black,
               unselectedLabelColor: Colors.grey,
               indicatorColor: isDark ? Colors.white : Colors.black,
-              tabs: const [Tab(text: 'Players'), Tab(text: 'Teams')],
+              tabs: [Tab(text: 'players'.tr()), Tab(text: 'teams'.tr())],
             ),
           ),
           Expanded(
@@ -202,9 +203,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
               children: [
                 // Players
                 isLoadingPlayers
-                    ? const Center(child: CircularProgressIndicator())
+                    ? Center(child: CircularProgressIndicator())
                     : playerError != null
-                    ? Center(child: Text('Error: $playerError'))
+                    ? Center(child: Text('${'error'.tr()}: $playerError'))
                     : RefreshIndicator(
                       onRefresh: _loadPlayerLeaderboard,
                       child: ListView.builder(
@@ -220,9 +221,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
 
                 // Teams
                 isLoadingTeams
-                    ? const Center(child: CircularProgressIndicator())
+                    ? Center(child: CircularProgressIndicator())
                     : teamError != null
-                    ? Center(child: Text('Error: $teamError'))
+                    ? Center(child: Text('${'error'.tr()}: $teamError'))
                     : RefreshIndicator(
                       onRefresh: _loadTeamLeaderboard,
                       child: ListView.builder(

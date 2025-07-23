@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'carousel.dart';
 import 'event_cards/cards.dart';
 import 'socialIcons.dart';
@@ -29,11 +30,11 @@ class MainPageState extends State<MainPage> {
       children: [
         CarouselWidget(key: _carouselKey),
         const SizedBox(height: 40),
-        const Center(
+        Center(
           child: Text(
-            'NEXT EVENTS',
+            'next_events'.tr(),
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 25, fontWeight: FontWeight.w900),
+            style: const TextStyle(fontSize: 25, fontWeight: FontWeight.w900),
           ),
         ),
         const SizedBox(height: 40),

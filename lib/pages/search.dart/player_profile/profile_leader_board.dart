@@ -1,6 +1,7 @@
 import 'package:fiba_3x3/services/leader_board_service.dart';
 import 'package:fiba_3x3/services/players_profile_service.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class LeaderBoardPage extends StatefulWidget {
   final int loggedInPlayerId;
@@ -98,7 +99,7 @@ class _LeaderBoardPageState extends State<LeaderBoardPage>
           labelColor: textColor,
           unselectedLabelColor: Colors.grey,
           indicatorColor: textColor,
-          tabs: const [Tab(text: 'Players'), Tab(text: 'Teams')],
+          tabs: [Tab(text: 'players'.tr()), Tab(text: 'teams'.tr())],
         ),
         Expanded(
           child: TabBarView(

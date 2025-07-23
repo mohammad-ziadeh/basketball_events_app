@@ -7,6 +7,7 @@ import 'package:fiba_3x3/widgets/custom_drawer.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ReadOnlyPlayerProfilePage extends StatefulWidget {
   final int playerId;
@@ -117,11 +118,11 @@ class _ReadOnlyPlayerProfilePageState extends State<ReadOnlyPlayerProfilePage>
                                       ? Colors.white
                                       : Colors.black,
                               unselectedLabelColor: Colors.grey,
-                              tabs: const [
-                                Tab(text: 'ABOUT'),
-                                Tab(text: 'ACTIVITY'),
-                                Tab(text: 'LEADERBOARD'),
-                                Tab(text: 'SOCIAL MEDIA'),
+                              tabs: [
+                                Tab(text: 'about'.tr()),
+                                Tab(text: 'activity'.tr()),
+                                Tab(text: 'leaderboard'.tr()),
+                                Tab(text: 'social_media'.tr()),
                               ],
                             ),
                           ),
@@ -136,7 +137,11 @@ class _ReadOnlyPlayerProfilePageState extends State<ReadOnlyPlayerProfilePage>
                                   player: player,
                                   loggedInPlayerId: player!.id,
                                 ),
-                                Center(child: Text('${player!.points} Points')),
+                                Center(
+                                  child: Text(
+                                    '${player!.points}  ${"points".tr()}',
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -320,10 +325,10 @@ class _BadgesRow extends StatelessWidget {
 
   final Map<String, int> _pointsRequired = {
     'Rookie': 0,
-    'Pro Player': 35,
-    'All-Star': 70,
-    'Elite': 100,
-    'Legend': 150,
+    'Pro Player': 75,
+    'All-Star': 120,
+    'Elite': 200,
+    'Legend': 350,
   };
 
   _BadgesRow({required this.badges});
@@ -331,7 +336,7 @@ class _BadgesRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (badges.isEmpty) {
-      return const Text('No badges earned yet.');
+      return Text('no_badges'.tr());
     }
 
     return Wrap(
@@ -345,8 +350,10 @@ class _BadgesRow extends StatelessWidget {
                 final requiredPoints = _pointsRequired[badge.title] ?? 0;
                 final msg =
                     badge.unlocked
-                        ? 'Badge "${badge.title}" unlocked!'
-                        : 'Need $requiredPoints points to unlock "${badge.title}".';
+                        ? 'badge_unlocked'.tr(args: [badge.title])
+                        : 'badge_locked'.tr(
+                          args: [requiredPoints.toString(), badge.title],
+                        );
                 ScaffoldMessenger.of(
                   context,
                 ).showSnackBar(SnackBar(content: Text(msg)));
