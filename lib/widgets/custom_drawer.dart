@@ -80,15 +80,21 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     },
                   ),
                   _DrawerMenuItem(
-                    title: 'NEWS',
+                    title: 'PLAYERS',
                     onTap: () {
-                      Navigator.of(context).pushNamed('/news');
+                      Navigator.of(context).pushNamed('/search-player');
                     },
                   ),
                   _DrawerMenuItem(
                     title: 'LEADERBOARD',
                     onTap: () {
                       Navigator.of(context).pushNamed('/leaderboard');
+                    },
+                  ),
+                  _DrawerMenuItem(
+                    title: 'NEWS',
+                    onTap: () {
+                      Navigator.of(context).pushNamed('/news');
                     },
                   ),
                   _DrawerMenuItem(
@@ -101,12 +107,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     title: 'RULES',
                     onTap: () {
                       Navigator.of(context).pushNamed('/rules');
-                    },
-                  ),
-                  _DrawerMenuItem(
-                    title: 'PLAYERS',
-                    onTap: () {
-                      Navigator.of(context).pushNamed('/search-player');
                     },
                   ),
 

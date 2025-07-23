@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SocialMediaBar extends StatelessWidget {
   const SocialMediaBar({super.key});
@@ -12,7 +13,6 @@ class SocialMediaBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         children: [
-          // Logo Row
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -21,7 +21,15 @@ class SocialMediaBar extends StatelessWidget {
           ),
 
           const SizedBox(height: 16),
-
+          ExpansionTile(
+            title: Text(
+              'Events',
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+            iconColor: Colors.white,
+            textColor: Colors.white,
+            children: _buildMenuItems(context, section: 'Events'),
+          ),
           ExpansionTile(
             title: Text(
               '3x3',
@@ -32,24 +40,30 @@ class SocialMediaBar extends StatelessWidget {
             children: _buildMenuItems(context, section: '3x3'),
           ),
 
-          ExpansionTile(
-            title: Text(
-              'Events',
-              style: TextStyle(color: Colors.white, fontSize: 16),
-            ),
-            iconColor: Colors.white,
-            textColor: Colors.white,
-            children: _buildEventItems(context),
-          ),
-
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildSocialIcon(FontAwesomeIcons.youtube, 'YouTube'),
-              _buildSocialIcon(FontAwesomeIcons.facebook, 'Facebook'),
-              _buildSocialIcon(FontAwesomeIcons.instagram, 'Instagram'),
-              _buildSocialIcon(FontAwesomeIcons.tiktok, 'TikTok'),
+              _buildSocialIcon(
+                FontAwesomeIcons.youtube,
+                'YouTube',
+                'https://www.youtube.com/@FIBA',
+              ),
+              _buildSocialIcon(
+                FontAwesomeIcons.facebook,
+                'Facebook',
+                'https://www.facebook.com/FIBA',
+              ),
+              _buildSocialIcon(
+                FontAwesomeIcons.instagram,
+                'Instagram',
+                'https://www.instagram.com/FIBA/',
+              ),
+              _buildSocialIcon(
+                FontAwesomeIcons.tiktok,
+                'TikTok',
+                'https://tiktok.com',
+              ),
             ],
           ),
         ],
@@ -61,67 +75,56 @@ class SocialMediaBar extends StatelessWidget {
     BuildContext context, {
     required String section,
   }) {
-    final Map<String, List<String>> menu = {
-      '3x3': [
-        'Vision',
-        'Organization',
-        'Ball',
-        'Rules',
-        'Referees',
-        'Competition network',
-        'Pro career',
-        'Documents',
-        'FAQ',
-        'Glossary',
+    final Map<String, List<Map<String, String>>> menu = {
+      'Events': [
+        {'label': 'Home', 'route': '/home'},
+        {'label': 'Profile', 'route': '/profile'},
+        {'label': 'Events', 'route': '/search-event'},
       ],
-      'Events': ['Quick links', 'Calendar', 'How to Qualify'],
+      '3x3': [
+        {'label': 'LeaderBoard', 'route': '/leaderboard'},
+        {'label': 'Players', 'route': '/search-player'},
+        {'label': 'News', 'route': '/news'},
+        {'label': 'Ball Info', 'route': '/ball-info'},
+        {'label': 'Rules', 'route': '/rules'},
+        {'label': 'Teams', 'route': '/team'},
+      ],
     };
 
-    final List<String> items = menu[section] ?? [];
+    final List<Map<String, String>> items = menu[section] ?? [];
 
     return items.map((item) {
       return ListTile(
         title: Text(
-          item,
+          item['label']!,
           style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
         ),
+        onTap: () {
+          Navigator.pushNamed(context, item['route']!);
+        },
       );
     }).toList();
   }
 
-  List<Widget> _buildEventItems(BuildContext context) {
-    return [
-      ListTile(
-        title: Text(
-          'Quick links',
-          style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
+  Widget _buildSocialIcon(IconData icon, String label, String url) {
+    return InkWell(
+      onTap: () async {
+        final Uri uri = Uri.parse(url);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        } else {
+          print('Could not launch $url');
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Column(
+          children: [
+            FaIcon(icon, size: 24, color: Colors.white),
+            const SizedBox(height: 4),
+            Text(label, style: TextStyle(fontSize: 12, color: Colors.white)),
+          ],
         ),
-      ),
-      ListTile(
-        title: Text(
-          'Calendar',
-          style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
-        ),
-      ),
-      ListTile(
-        title: Text(
-          'How to Qualify',
-
-          style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
-        ),
-      ),
-    ];
-  }
-
-  Widget _buildSocialIcon(IconData icon, String label) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Column(
-        children: [
-          FaIcon(icon, size: 24, color: Colors.white),
-          const SizedBox(height: 4),
-          Text(label, style: TextStyle(fontSize: 12, color: Colors.white)),
-        ],
       ),
     );
   }
