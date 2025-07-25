@@ -98,6 +98,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     },
                   ),
                   _DrawerMenuItem(
+                    title: 'gallery'.tr(),
+                    onTap: () {
+                      Navigator.of(context).pushNamed('/gallery');
+                    },
+                  ),
+                  _DrawerMenuItem(
                     title: 'ball_info'.tr(),
                     onTap: () {
                       Navigator.of(context).pushNamed('/ball-info');

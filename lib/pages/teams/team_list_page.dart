@@ -94,8 +94,8 @@ class _TeamListPageState extends State<TeamListPage> {
       endDrawer: const CustomDrawer(),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _navigateToEditTeam(context),
-        child: const Icon(Icons.add),
         tooltip: tr('create_team'),
+        child: const Icon(Icons.add),
       ),
       body:
           _loading

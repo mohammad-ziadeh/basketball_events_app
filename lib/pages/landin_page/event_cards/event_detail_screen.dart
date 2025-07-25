@@ -7,7 +7,6 @@ import 'package:fiba_3x3/services/event_service.dart';
 import 'package:fiba_3x3/services/matchup_events_service.dart' hide Category;
 import 'package:fiba_3x3/services/team_service.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 // Assuming you are using easy_localization or a similar package
 import 'package:easy_localization/easy_localization.dart'; // Make sure this import matches your localization package
 

@@ -3,7 +3,6 @@ import 'package:fiba_3x3/pages/landin_page/event_cards/event_detail_screen.dart'
 import 'package:fiba_3x3/services/event_service.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:intl/intl.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class EventCard extends StatefulWidget {

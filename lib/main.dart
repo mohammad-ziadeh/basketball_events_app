@@ -1,4 +1,5 @@
 import 'package:fiba_3x3/pages/ball_info/ball.dart';
+import 'package:fiba_3x3/pages/gallery/gallery_screen.dart';
 import 'package:fiba_3x3/pages/leaderboard/leaderboard_screen.dart';
 import 'package:fiba_3x3/pages/news/article_news.dart';
 import 'package:fiba_3x3/pages/notifications/notifications_screen.dart';
@@ -166,6 +167,7 @@ class _MyAppState extends State<MyApp> {
             (context) => LeaderboardScreen(onToggleTheme: _toggleTheme),
         '/news': (context) => BasketballNewsPage(onToggleTheme: _toggleTheme),
         '/team': (context) => TeamListPage(onToggleTheme: _toggleTheme),
+        '/gallery': (context) => GalleryScreen(onToggleTheme: _toggleTheme),
         '/search-event': (context) => SearchEvent(onToggleTheme: _toggleTheme),
         '/notifications': (context) => NotificationsScreen(),
         '/search-player':

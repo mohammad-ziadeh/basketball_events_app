@@ -1,7 +1,6 @@
 import 'package:fiba_3x3/pages/search.dart/player_profile/player_profile_page.dart';
 import 'package:fiba_3x3/services/matchup_events_service.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class MatchupDetailScreen extends StatefulWidget {

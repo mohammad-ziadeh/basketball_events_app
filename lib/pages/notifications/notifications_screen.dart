@@ -1,6 +1,5 @@
 import 'package:fiba_3x3/services/NotificationService.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // For better timestamp formatting
 import 'package:easy_localization/easy_localization.dart';
 
 class NotificationsScreen extends StatefulWidget {
