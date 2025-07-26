@@ -1,4 +1,6 @@
+import 'package:fiba_3x3/pages/Auth/auth_main.dart';
 import 'package:fiba_3x3/services/NotificationService.dart';
+import 'package:fiba_3x3/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -98,15 +100,41 @@ class _ResponsiveAppBarState extends State<ResponsiveAppBar> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  _AppBarMenuItem(title: 'HOME', route: '/home'),
-                  _AppBarMenuItem(title: 'PROFILE', route: '/profile'),
-                  _AppBarMenuItem(title: '3x3'),
-                  _AppBarMenuItem(title: 'EVENTS', route: '/search-event'),
-                  _AppBarMenuItem(title: 'BALL INFO', route: '/ball-info'),
-                  _AppBarMenuItem(title: 'RULES', route: '/rules'),
-                  _AppBarMenuItem(title: 'PLAYERS', route: '/search-player'),
-                  _AppBarMenuItem(title: 'ORGANIZERS'),
-                  _AppBarMenuItem(title: 'FEDERATIONS'),
+                  _AppBarMenuItem(title: 'home'.tr(), route: '/home'),
+                  _AppBarMenuItem(title: 'profile'.tr(), route: '/profile'),
+                  _AppBarMenuItem(title: 'events'.tr(), route: '/search-event'),
+                  _AppBarMenuItem(
+                    title: 'players'.tr(),
+                    route: '/search-player',
+                  ),
+                  _AppBarMenuItem(
+                    title: 'leaderboard'.tr(),
+                    route: '/leaderboard',
+                  ),
+                  _AppBarMenuItem(title: 'news'.tr(), route: '/news'),
+                  _AppBarMenuItem(title: 'gallery'.tr(), route: '/gallery'),
+                  _AppBarMenuItem(title: 'ball_info'.tr(), route: '/ball-info'),
+                  _AppBarMenuItem(title: 'rules'.tr(), route: '/rules'),
+                  _AppBarMenuItem(title: 'teams'.tr(), route: '/team'),
+                  TextButton(
+                    onPressed: () async {
+                      final authService = AuthService();
+                      await authService.logout();
+                      if (!mounted) return;
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder:
+                              (_) =>
+                                  AuthMain(onToggleTheme: widget.onToggleTheme),
+                        ),
+                        (route) => false,
+                      );
+                    },
+                    child: Text(
+                      'logout'.tr(),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
                   IconButton(
                     icon: const Icon(Icons.brightness_6),
                     onPressed: widget.onToggleTheme,

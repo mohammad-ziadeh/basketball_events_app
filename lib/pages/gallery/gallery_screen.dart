@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:fiba_3x3/pages/gallery/media_tile.dart';
 import 'package:fiba_3x3/services/gallery_service.dart';
 import 'package:flutter/material.dart';
@@ -53,7 +54,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
         isLoading = false;
       });
     } catch (e) {
-      print('Error: $e');
       setState(() => isLoading = false);
     }
   }
@@ -64,16 +64,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
       child: Row(
         children: [
           Expanded(
-            child: DropdownButtonFormField<String>(
+            child: DropdownButtonFormField2<String>(
+              style: const TextStyle(color: Colors.white),
               value: selectedType,
-              onChanged:
-                  isLoading
-                      ? null
-                      : (val) {
-                        setState(() => selectedType = val!);
-                        fetchGalleries();
-                      },
-              decoration: const InputDecoration(labelText: 'Type'),
               items:
                   _types
                       .map(
@@ -81,20 +74,40 @@ class _GalleryScreenState extends State<GalleryScreen> {
                             DropdownMenuItem(value: type, child: Text(type)),
                       )
                       .toList(),
+              onChanged:
+                  isLoading
+                      ? null
+                      : (value) {
+                        if (value != null) {
+                          setState(() {
+                            selectedType = value;
+                          });
+                          fetchGalleries();
+                        }
+                      },
+              decoration: InputDecoration(
+                labelText: 'Type',
+                labelStyle: const TextStyle(color: Colors.white),
+                contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                filled: true,
+                fillColor: Colors.black,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+              dropdownStyleData: DropdownStyleData(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(6),
+                  color: Colors.black,
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: DropdownButtonFormField<String>(
+            child: DropdownButtonFormField2<String>(
+              style: const TextStyle(color: Colors.white),
               value: selectedEventTitle,
-              onChanged:
-                  isLoading
-                      ? null
-                      : (val) {
-                        setState(() => selectedEventTitle = val!);
-                        fetchGalleries();
-                      },
-              decoration: const InputDecoration(labelText: 'Event'),
               items:
                   eventTitles
                       .map(
@@ -102,6 +115,34 @@ class _GalleryScreenState extends State<GalleryScreen> {
                             DropdownMenuItem(value: title, child: Text(title)),
                       )
                       .toList(),
+              onChanged:
+                  isLoading
+                      ? null
+                      : (value) {
+                        if (value != null) {
+                          setState(() {
+                            selectedEventTitle = value;
+                          });
+                          fetchGalleries();
+                        }
+                      },
+              decoration: InputDecoration(
+                labelText: 'Event',
+                labelStyle: const TextStyle(color: Colors.white),
+                contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                filled: true,
+                fillColor: Colors.black,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+              dropdownStyleData: DropdownStyleData(
+                maxHeight: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(6),
+                  color: Colors.black,
+                ),
+              ),
             ),
           ),
         ],
