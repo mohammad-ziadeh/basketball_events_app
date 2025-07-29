@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:fiba_3x3/pages/landin_page/event_cards/event_leaderboards_creen.dart';
 import 'package:fiba_3x3/pages/landin_page/event_cards/matchups_with_tabs.dart';
 import 'package:fiba_3x3/pages/search.dart/team_profile/team_players_page.dart';
 import 'package:fiba_3x3/services/category_service.dart';
@@ -7,8 +8,7 @@ import 'package:fiba_3x3/services/event_service.dart';
 import 'package:fiba_3x3/services/matchup_events_service.dart' hide Category;
 import 'package:fiba_3x3/services/team_service.dart';
 import 'package:flutter/material.dart';
-// Assuming you are using easy_localization or a similar package
-import 'package:easy_localization/easy_localization.dart'; // Make sure this import matches your localization package
+import 'package:easy_localization/easy_localization.dart';
 
 class EventDetailScreen extends StatefulWidget {
   final Event event;
@@ -180,11 +180,10 @@ class _EventDetailScreenState extends State<EventDetailScreen>
         SnackBar(content: Text('team_assigned_successfully_message'.tr())),
       );
     } catch (e) {
-      // Note: Backend errors might need mapping to keys for full translation
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.toString().replaceFirst('Exception: ', '').tr()),
-        ), // Or map e.toString() to a key
+        ),
       );
     } finally {
       setState(() => isAssigning = false);
@@ -317,9 +316,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                                     .map(
                                       (team) => DropdownMenuItem<int>(
                                         value: team['id'] as int,
-                                        child: Text(
-                                          team['name'],
-                                        ), // Team name is dynamic
+                                        child: Text(team['name']),
                                       ),
                                     )
                                     .toList(),
@@ -470,7 +467,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.event.title, // Dynamic title
+          widget.event.title,
           style: const TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.black,
@@ -515,7 +512,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
             ),
             const SizedBox(height: 20),
             Text(
-              widget.event.title, // Dynamic title
+              widget.event.title,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: textColor,
@@ -528,7 +525,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    widget.event.location, // Dynamic location
+                    widget.event.location,
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: secondaryTextColor,
                     ),
@@ -542,7 +539,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                 Icon(Icons.date_range, color: iconColor),
                 const SizedBox(width: 6),
                 Text(
-                  '${dateFormat.format(widget.event.startDate)} to ${dateFormat.format(widget.event.endDate)}', // Dynamic dates
+                  '${dateFormat.format(widget.event.startDate)} to ${dateFormat.format(widget.event.endDate)}',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: secondaryTextColor,
@@ -558,13 +555,44 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                 Text(
                   'event_code_label'.tr(
                     namedArgs: {'code': widget.event.eventCode},
-                  ), // Assuming 'event_code_label': 'Event Code: {code}'
+                  ),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: secondaryTextColor,
                   ),
                 ),
               ],
             ),
+            const SizedBox(height: 20),
+            if (isRegistrationClosed) ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.leaderboard),
+                    label: Text('View Leaderboard'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (_) => EventLeaderboardScreen(
+                                eventId: widget.event.id,
+                              ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
+
             if (categories.isNotEmpty && !isRegistrationClosed)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
@@ -584,9 +612,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                           unselectedLabelColor: Colors.grey,
                           tabs:
                               categories
-                                  .map(
-                                    (cat) => Tab(text: cat.name),
-                                  ) // Dynamic category names
+                                  .map((cat) => Tab(text: cat.name))
                                   .toList(),
                         )
                         : const SizedBox.shrink(),
@@ -659,7 +685,6 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                                       'capacity': category.capacity.toString(),
                                     },
                                   ),
-                                  // Assuming 'teams_assigned_label': 'Teams Assigned to {categoryName} ({assignedCount}/{capacity}):'
                                   style: Theme.of(
                                     context,
                                   ).textTheme.titleMedium?.copyWith(
@@ -685,9 +710,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                                       itemBuilder: (context, index) {
                                         final team = approvedTeams[index];
                                         return ListTile(
-                                          title: Text(
-                                            team.name,
-                                          ), // Dynamic team name
+                                          title: Text(team.name),
                                           leading: const Icon(Icons.group),
                                           onTap: () {
                                             Navigator.push(
@@ -712,10 +735,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                   ),
                 ),
             const SizedBox(height: 30),
-            if ((userRole == 'coach' ||
-                    userRole == 'admin' ||
-                    userRole == 'player') &&
-                isRegistrationClosed) ...[
+            if (isRegistrationClosed) ...[
               if (isLoadingMatchups)
                 Center(child: CircularProgressIndicator(color: iconColor))
               else if (matchupError != null)
@@ -723,7 +743,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                   child: Text(
                     'error_loading_matchups'.tr(
                       namedArgs: {'error': matchupError!},
-                    ), // Assuming 'error_loading_matchups': 'Error loading match-ups: {error}'
+                    ),
                     style: const TextStyle(color: Colors.redAccent),
                   ),
                 )

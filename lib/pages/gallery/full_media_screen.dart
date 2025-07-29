@@ -19,7 +19,6 @@ class FullMediaScreen extends StatefulWidget {
   @override
   State<FullMediaScreen> createState() => _FullMediaScreenState();
 
-  /// Static helper to save image file path to gallery, returns bool success
   static Future<bool> saveImageToGallery(String imagePath) async {
     try {
       final AssetEntity result = await PhotoManager.editor.saveImageWithPath(
@@ -44,6 +43,7 @@ class _FullMediaScreenState extends State<FullMediaScreen> {
   @override
   void initState() {
     super.initState();
+
     if (widget.gallery.type == 'video') {
       _videoPlayerController = VideoPlayerController.network(
         widget.gallery.url,
@@ -117,9 +117,52 @@ class _FullMediaScreenState extends State<FullMediaScreen> {
 
       await file.delete();
     } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("An unexpected error occurred. Please try again."),
+        ),
+      );
+    }
+  }
+
+  Future<void> _downloadVideo() async {
+    try {
+      final hasPermission = await _requestPermission();
+      if (!hasPermission) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Permission denied.")),
+        );
+        return;
+      }
+
+      final response = await http.get(Uri.parse(widget.gallery.url));
+      if (response.statusCode != 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Download failed: ${response.statusCode}")),
+        );
+        return;
+      }
+
+      Uint8List videoBytes = Uint8List.fromList(response.bodyBytes);
+
+      final tempDir = await getTemporaryDirectory();
+      final file =
+          await File(
+            '${tempDir.path}/fiba_${DateTime.now().millisecondsSinceEpoch}.mp4',
+          ).create();
+      await file.writeAsBytes(videoBytes);
+
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Error: $e")));
+      ).showSnackBar(const SnackBar(content: Text("Video saved to gallery.")));
+
+      await file.delete();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("An unexpected error occurred. Please try again."),
+        ),
+      );
     }
   }
 
@@ -156,6 +199,11 @@ class _FullMediaScreenState extends State<FullMediaScreen> {
             _chewieController != null
                 ? Chewie(controller: _chewieController!)
                 : const Center(child: CircularProgressIndicator()),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _downloadVideo,
+          tooltip: 'Download Video',
+          child: const Icon(Icons.download),
+        ),
       );
     }
 
@@ -165,7 +213,7 @@ class _FullMediaScreenState extends State<FullMediaScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.download),
-            tooltip: 'Download Media',
+            tooltip: 'Download Image',
             onPressed: _downloadImage,
           ),
         ],

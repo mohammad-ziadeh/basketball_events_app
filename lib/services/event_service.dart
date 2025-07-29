@@ -1,6 +1,26 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+class EventLeaderboardEntry {
+  final int teamId;
+  final String teamName;
+  final int points;
+
+  EventLeaderboardEntry({
+    required this.teamId,
+    required this.teamName,
+    required this.points,
+  });
+
+  factory EventLeaderboardEntry.fromJson(Map<String, dynamic> json) {
+    return EventLeaderboardEntry(
+      teamId: json['team_id'],
+      teamName: json['team_name'],
+      points: json['points'],
+    );
+  }
+}
+
 class Event {
   final int id;
   final String title;
@@ -63,6 +83,20 @@ class EventService {
       return Event.fromJson(json.decode(response.body));
     } else {
       throw Exception('Failed to load event');
+    }
+  }
+
+  Future<List<EventLeaderboardEntry>> fetchEventLeaderboardById(int id) async {
+    final response = await http.get(Uri.parse('$apiUrl/$id'));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final List<dynamic> leaderboardJson = data['leaderboard'];
+      return leaderboardJson
+          .map((e) => EventLeaderboardEntry.fromJson(e))
+          .toList();
+    } else {
+      throw Exception('Failed to load event leaderboard');
     }
   }
 }
