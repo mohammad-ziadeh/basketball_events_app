@@ -52,13 +52,19 @@ class Event {
     }
 
     return Event(
-      id: json['id'],
-      title: json['title'],
-      location: json['location'],
-      updatedAt: DateTime.parse(json['updated_at']),
-      startDate: DateTime.parse(json['start_date']),
-      endDate: DateTime.parse(json['end_date']),
-      eventCode: json['event_code'],
+      id: json['id'] ?? 0,
+      title: json['title'] ?? 'Unknown Title',
+      location: json['location'] ?? 'Unknown Location',
+      updatedAt: DateTime.parse(
+        json['updated_at'] ?? DateTime.now().toIso8601String(),
+      ),
+      startDate: DateTime.parse(
+        json['start_date'] ?? DateTime.now().toIso8601String(),
+      ),
+      endDate: DateTime.parse(
+        json['end_date'] ?? DateTime.now().toIso8601String(),
+      ),
+      eventCode: json['event_code'] ?? '',
       imageUrl: imageUrl,
     );
   }
@@ -66,6 +72,8 @@ class Event {
 
 class EventService {
   final String apiUrl = "http://192.168.1.159:8000/api/events";
+  final String apiUrlLeaderboard =
+      "http://192.168.1.159:8000/api/events-leaderboard";
 
   Future<List<Event>> getEvents() async {
     final response = await http.get(Uri.parse(apiUrl));
@@ -87,7 +95,7 @@ class EventService {
   }
 
   Future<List<EventLeaderboardEntry>> fetchEventLeaderboardById(int id) async {
-    final response = await http.get(Uri.parse('$apiUrl/$id'));
+    final response = await http.get(Uri.parse('$apiUrlLeaderboard/$id'));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);

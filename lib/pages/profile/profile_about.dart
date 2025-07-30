@@ -24,6 +24,7 @@ class _PlayerAboutPageState extends State<PlayerAboutPage> {
         });
       } else {
         Future.delayed(const Duration(seconds: 2)).then((_) {
+          if (!mounted) return;
           setState(() {
             isLoading = false;
           });
@@ -65,7 +66,7 @@ class _PlayerAboutPageState extends State<PlayerAboutPage> {
             const Divider(),
             buildDetailRow(
               label: 'points'.tr(),
-              value: '${profile?.points ?? 0}', 
+              value: '${profile?.points ?? 0}',
             ),
           ],
         ),
