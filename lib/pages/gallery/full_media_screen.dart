@@ -129,9 +129,9 @@ class _FullMediaScreenState extends State<FullMediaScreen> {
     try {
       final hasPermission = await _requestPermission();
       if (!hasPermission) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Permission denied.")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Permission denied.")));
         return;
       }
 
@@ -152,9 +152,20 @@ class _FullMediaScreenState extends State<FullMediaScreen> {
           ).create();
       await file.writeAsBytes(videoBytes);
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Video saved to gallery.")));
+      // ignore: unnecessary_nullable_for_final_variable_declarations
+      final AssetEntity? result = await PhotoManager.editor.saveVideo(
+        File(file.path),
+      );
+
+      if (result != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Video saved to gallery.")),
+        );
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Failed to save video.")));
+      }
 
       await file.delete();
     } catch (e) {
